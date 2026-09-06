@@ -12,14 +12,14 @@
  * This test reproduces exactly that sequence with the fake CUDA backend
  * (tests/qwen36_fake_cuda.h, no GPU needed): budget one expert in, issue it
  * without taking it, queue an LFRU swap directly (what qt_lfru_tick_locked
- * does), then call qt_shutdown() under an alarm(10) so a hang fails loudly
- * instead of wedging CI. */
+ * does), then call qt_shutdown() under a 10-second watchdog thread so a hang
+ * fails loudly instead of wedging CI. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 #include <unistd.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "qwen36_fake_cuda.h"
 
@@ -34,8 +34,16 @@ static int issue_ok(int device, int count, const float *x) {
     (void)device; (void)count; (void)x; return 1;
 }
 
-static void on_alarm(int sig) {
-    (void)sig;
+/* Portable deadline. alarm()/SIGALRM are POSIX and MinGW/UCRT64 has neither,
+ * so the Windows job could not build this test at all. A detached thread that
+ * sleeps and then kills the process has the same contract as the alarm it
+ * replaces -- if qt_shutdown() has not returned by the deadline the test fails
+ * loudly instead of wedging CI -- and it keeps the test RUNNING on Windows
+ * rather than compiled out there. */
+static void *deadline(void *unused) {
+    (void)unused;
+    struct timespec limit = {10, 0};
+    nanosleep(&limit, NULL);
     (void)!write(2,"FAIL: qt_shutdown hung\n",23);
     _exit(1);
 }
@@ -112,10 +120,10 @@ int main(void) {
     }
     check(parked, "the uploader should have dequeued the swap within 1s");
 
-    signal(SIGALRM, on_alarm);
-    alarm(10);
+    pthread_t wd;
+    if (pthread_create(&wd, NULL, deadline, NULL) == 0) pthread_detach(wd);
+    else check(0, "watchdog thread should have started");
     qt_shutdown();
-    alarm(0);
     check(!G.on, "shutdown_returns_while_a_group_is_open");
     /* The abandoned swap must leave the victim exactly as the open group left
      * it, and must not have driven the incoming expert's upload after
