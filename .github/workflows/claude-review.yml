@@ -1,0 +1,62 @@
+name: Claude Code Review
+
+# Reviews every pull request opened against the crichalchemist fork from a branch
+# of the fork itself. Pull requests from other forks get no secrets, so they are skipped.
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: |
+      github.repository == 'crichalchemist/colibri' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Claude Code Action Official
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request for colibri, a pure-C, zero-dependency inference
+            engine. Report correctness problems first. Check in particular:
+
+            1. Semantics: the default path must never change model precision or router
+               behaviour. GPU backends are opt-in; the default CPU build stays dependency-free.
+            2. Shared code: a fix in one engine (colibri.c, glm53.c, qwen36.c, ...) that its
+               sibling engines also need belongs in a shared header.
+            3. Build gate: code must compile with 0 warnings under -Wall -Wextra.
+            4. Portability: tests must not use POSIX-only APIs (alarm, SIGALRM, pipe, dup2);
+               Windows UCRT64 is a CI target. Platform shims live in compat.h.
+            5. Backends: no #ifdef __HIP__ inside backend_cuda.cu; vendor differences live in
+               backend_gpu_compat.h.
+            6. Formats: a new quantization fmt ordinal must be claimed in docs/FORMATS.md.
+            7. Knobs: a new environment variable needs docs/ENVIRONMENT.md and docs/SETTINGS.md
+               regenerated.
+            8. Hygiene: no model files, generated binaries, fixtures or benchmark artifacts in
+               the diff. Benchmark claims need commit, commands, hardware, run count and medians.
+
+            Use inline comments for specific lines and one top-level comment for the summary.
+            Say plainly when you could not verify something.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
