@@ -1,0 +1,143 @@
+make: 'tests/test_vk_tier' is up to date.
+[VK] VRAM pressure-proofing: memory_priority on, memory_budget on
+[VK] warning: only 256 of 7936 MB VRAM is host-visible (Resizable BAR appears disabled) — allocations beyond the 256 MB window fall back to system RAM and will be slow. Enable Resizable BAR / Smart Access Memory in the BIOS.
+[VK] ready: AMD Radeon Pro 580X (RADV POLARIS10), compute qfam 0, memtype 3, fused gate+up, absorb attention, tiled GEMM from S=2 and S*O>=4096
+fmt=1 S=1 I=6144 O=1536 gemv | maxerr=3.815e-05 maxrel=0.0003662 | gpu=1.210 ms  cpu_ref=20.626 ms
+fmt=2 S=1 I=6144 O=1536 gemv | maxerr=2.384e-06 maxrel=4.292e-05 | gpu=0.683 ms  cpu_ref=24.868 ms
+fmt=1 S=1 I=1536 O=6144 gemv | maxerr=1.526e-05 maxrel=0.0001321 | gpu=1.084 ms  cpu_ref=21.415 ms
+fmt=2 S=8 I=6144 O=1536 gemv | maxerr=2.384e-06 maxrel=0.0001341 | gpu=4.254 ms  cpu_ref=238.332 ms
+fmt=1 S=1 I=512 O=512 gemv | maxerr=5.722e-06 maxrel=8.594e-06 | gpu=0.117 ms  cpu_ref=1.700 ms
+fmt=2 S=1 I=16384 O=6144 gemv | maxerr=6.199e-06 maxrel=0.0001937 | gpu=5.917 ms  cpu_ref=260.798 ms
+fmt=5 S=1 I=6144 O=2048 gemv | maxerr=7.153e-07 maxrel=1.21e-05 | gpu=0.768 ms  cpu_ref=41.915 ms
+fmt=5 S=1 I=2048 O=6144 gemv | maxerr=4.768e-07 maxrel=1.408e-05 | gpu=0.711 ms  cpu_ref=45.024 ms
+fmt=5 S=8 I=6144 O=2048 gemv | maxerr=9.537e-07 maxrel=3.464e-05 | gpu=4.632 ms  cpu_ref=341.127 ms
+fmt=5 S=1 I=100 O=64 gemv | maxerr=5.96e-08 maxrel=1.69e-06 | gpu=0.158 ms  cpu_ref=0.024 ms
+fmt=5 S=1 I=16384 O=6144 gemv | maxerr=1.907e-06 maxrel=6.317e-05 | gpu=5.323 ms  cpu_ref=358.239 ms
+fmt=10 S=1 I=6144 O=1536 gemv | maxerr=1.526e-05 maxrel=0.0001645 | gpu=4.288 ms  cpu_ref=20.871 ms
+fmt=10 S=8 I=2048 O=512 gemv | maxerr=7.629e-06 maxrel=8.447e-05 | gpu=3.559 ms  cpu_ref=17.631 ms
+fmt=10 S=1 I=16384 O=512 gemv | maxerr=3.815e-05 maxrel=2.817e-05 | gpu=3.887 ms  cpu_ref=18.645 ms
+fmt=10 S=3 I=37 O=5 gemv | maxerr=1.192e-07 maxrel=1.269e-06 | gpu=0.076 ms  cpu_ref=0.001 ms
+fmt=11 S=1 I=6144 O=1536 gemv | maxerr=1.717e-05 maxrel=5.939e-05 | gpu=2.284 ms  cpu_ref=20.424 ms
+fmt=11 S=8 I=2048 O=512 gemv | maxerr=7.629e-06 maxrel=5.287e-05 | gpu=1.002 ms  cpu_ref=18.306 ms
+fmt=11 S=1 I=16384 O=512 gemv | maxerr=4.959e-05 maxrel=0.0001004 | gpu=2.069 ms  cpu_ref=17.818 ms
+fmt=11 S=3 I=37 O=5 gemv | maxerr=4.768e-07 maxrel=2.73e-07 | gpu=0.104 ms  cpu_ref=0.005 ms
+fmt=12 gs=64 S=1 I=6144 O=1536 gemv | maxerr=3.242e-05 maxrel=0.0001413 | gpu=1.354 ms  cpu_ref=110.793 ms
+fmt=12 gs=64 S=8 I=2048 O=512 gemv | maxerr=1.907e-05 maxrel=0.0002937 | gpu=0.376 ms  cpu_ref=96.726 ms
+fmt=12 gs=64 S=1 I=16384 O=512 gemv | maxerr=9.155e-05 maxrel=8.703e-05 | gpu=1.165 ms  cpu_ref=103.048 ms
+fmt=12 gs=64 S=3 I=100 O=5 gemv | maxerr=9.537e-07 maxrel=4.709e-07 | gpu=0.061 ms  cpu_ref=0.016 ms
+fmt=12 gs=32 S=2 I=4096 O=256 gemv | maxerr=1.717e-05 maxrel=3.025e-05 | gpu=0.189 ms  cpu_ref=24.403 ms
+fmt=12 gs=128 S=2 I=4096 O=256 gemv | maxerr=2.289e-05 maxrel=9.353e-05 | gpu=0.179 ms  cpu_ref=24.480 ms
+fmt=13 gs=64 S=1 I=6144 O=1536 gemv | maxerr=2.289e-05 maxrel=0.0002004 | gpu=1.302 ms  cpu_ref=20.644 ms
+fmt=13 gs=64 S=8 I=2048 O=512 gemv | maxerr=1.526e-05 maxrel=0.0001727 | gpu=0.297 ms  cpu_ref=20.406 ms
+fmt=13 gs=64 S=1 I=16384 O=512 gemv | maxerr=4.578e-05 maxrel=0.0003054 | gpu=1.186 ms  cpu_ref=17.533 ms
+fmt=13 gs=64 S=3 I=100 O=5 gemv | maxerr=1.907e-06 maxrel=1.719e-07 | gpu=0.062 ms  cpu_ref=0.005 ms
+fmt=13 gs=128 S=2 I=4096 O=256 gemv | maxerr=1.526e-05 maxrel=6.284e-05 | gpu=0.169 ms  cpu_ref=4.363 ms
+fmt=1 S=16 I=1001 O=193 gemm | maxerr=2.289e-05 maxrel=6.147e-05 | gpu=0.305 ms  cpu_ref=6.450 ms
+fmt=1 S=64 I=1536 O=97 gemm | maxerr=2.289e-05 maxrel=0.0003758 | gpu=0.472 ms  cpu_ref=20.201 ms
+fmt=1 S=512 I=520 O=131 gemm | maxerr=1.526e-05 maxrel=0.0005495 | gpu=0.418 ms  cpu_ref=78.167 ms
+fmt=2 S=16 I=1001 O=193 gemm | maxerr=1.192e-06 maxrel=2.462e-05 | gpu=0.308 ms  cpu_ref=8.112 ms
+fmt=2 S=64 I=1536 O=97 gemm | maxerr=1.907e-06 maxrel=4.873e-05 | gpu=0.484 ms  cpu_ref=24.945 ms
+fmt=2 S=512 I=520 O=131 gemm | maxerr=9.537e-07 maxrel=2.834e-05 | gpu=0.409 ms  cpu_ref=94.816 ms
+fmt=4 gs=64 S=16 I=1001 O=193 gemm | maxerr=1.431e-06 maxrel=1.498e-05 | gpu=0.359 ms  cpu_ref=9.237 ms
+fmt=4 gs=64 S=64 I=1536 O=97 gemm | maxerr=1.431e-06 maxrel=4.054e-05 | gpu=0.494 ms  cpu_ref=26.155 ms
+fmt=4 gs=64 S=512 I=520 O=131 gemm | maxerr=7.153e-07 maxrel=2.659e-05 | gpu=0.413 ms  cpu_ref=97.907 ms
+fmt=5 S=16 I=1001 O=193 gemm | maxerr=4.768e-07 maxrel=1.847e-05 | gpu=0.300 ms  cpu_ref=10.708 ms
+fmt=5 S=64 I=1536 O=97 gemm | maxerr=7.153e-07 maxrel=1.656e-05 | gpu=0.497 ms  cpu_ref=32.588 ms
+fmt=5 S=512 I=520 O=131 gemm | maxerr=3.576e-07 maxrel=1.37e-05 | gpu=0.432 ms  cpu_ref=123.866 ms
+fmt=7 gs=32 S=16 I=1001 O=193 gemm | maxerr=5.364e-07 maxrel=1.473e-05 | gpu=0.517 ms  cpu_ref=19.753 ms
+fmt=7 gs=32 S=64 I=1536 O=97 gemm | maxerr=9.537e-07 maxrel=2.199e-05 | gpu=0.516 ms  cpu_ref=59.387 ms
+fmt=7 gs=32 S=512 I=520 O=131 gemm | maxerr=4.768e-07 maxrel=1.824e-05 | gpu=0.452 ms  cpu_ref=220.119 ms
+fmt=10 S=16 I=1001 O=193 gemm | maxerr=7.629e-06 maxrel=6.534e-05 | gpu=0.351 ms  cpu_ref=6.470 ms
+fmt=10 S=64 I=1536 O=97 gemm | maxerr=1.144e-05 maxrel=0.000104 | gpu=0.537 ms  cpu_ref=20.851 ms
+fmt=10 S=512 I=520 O=131 gemm | maxerr=5.722e-06 maxrel=0.0001239 | gpu=0.411 ms  cpu_ref=73.969 ms
+fmt=11 S=16 I=1001 O=193 gemm | maxerr=7.629e-06 maxrel=0.0001996 | gpu=0.400 ms  cpu_ref=6.493 ms
+fmt=11 S=64 I=1536 O=97 gemm | maxerr=1.144e-05 maxrel=0.0001265 | gpu=0.515 ms  cpu_ref=21.822 ms
+fmt=11 S=512 I=520 O=131 gemm | maxerr=5.722e-06 maxrel=0.0001708 | gpu=0.403 ms  cpu_ref=76.059 ms
+fmt=12 gs=64 S=16 I=1001 O=193 gemm | maxerr=3.052e-05 maxrel=0.0002141 | gpu=0.419 ms  cpu_ref=35.924 ms
+fmt=12 gs=64 S=64 I=1536 O=97 gemm | maxerr=3.052e-05 maxrel=0.0005084 | gpu=0.649 ms  cpu_ref=110.495 ms
+fmt=12 gs=64 S=512 I=520 O=131 gemm | maxerr=1.907e-05 maxrel=0.0002559 | gpu=0.469 ms  cpu_ref=416.989 ms
+fmt=13 gs=64 S=16 I=1001 O=193 gemm | maxerr=1.526e-05 maxrel=0.000205 | gpu=0.417 ms  cpu_ref=6.661 ms
+fmt=13 gs=64 S=64 I=1536 O=97 gemm | maxerr=2.098e-05 maxrel=0.0001907 | gpu=0.556 ms  cpu_ref=21.256 ms
+fmt=13 gs=64 S=512 I=520 O=131 gemm | maxerr=1.144e-05 maxrel=0.000587 | gpu=0.440 ms  cpu_ref=78.081 ms
+fmt=1 S=37 I=999 O=65 gemm | maxerr=1.907e-05 maxrel=0.0001121 | gpu=0.322 ms  cpu_ref=5.439 ms
+fmt=4 gs=8 S=33 I=1001 O=70 gemm | maxerr=9.537e-07 maxrel=2.155e-05 | gpu=0.357 ms  cpu_ref=6.654 ms
+fmt=4 gs=24 S=33 I=1001 O=70 gemm | maxerr=1.192e-06 maxrel=2.7e-05 | gpu=0.339 ms  cpu_ref=6.257 ms
+fmt=12 gs=12 S=33 I=1001 O=70 gemm | maxerr=3.052e-05 maxrel=0.0002129 | gpu=0.387 ms  cpu_ref=28.726 ms
+fmt=12 gs=128 S=33 I=1001 O=70 gemm | maxerr=2.289e-05 maxrel=0.0003628 | gpu=0.773 ms  cpu_ref=27.602 ms
+fmt=13 gs=12 S=33 I=1001 O=70 gemm | maxerr=1.526e-05 maxrel=0.0002283 | gpu=0.346 ms  cpu_ref=5.102 ms
+xbatch: tier queue of its own, GEMM route from 16 rows, timestamps on
+tier pool: 10 experts fit a budget of 10.5 (87040 bytes each), refusals 1, 1 block(s), frag 0.000
+tier pool: frees during a batch held 870400 -> 870400 bytes, after the join 609280
+tier pool: 3 of 3 experts uploaded again into the freed room, 1 blocks, 870400 of 913408 bytes used
+tier pool: all freed, 0 bytes used, 0 live ranges, 1 block(s) kept
+xbatch fmt=1/1 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.3e-05 | row bits independent of the batch: yes | device 0.212 ms
+xbatch fmt=2/2 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.49e-05 | row bits independent of the batch: yes | device 0.210 ms
+xbatch fmt=4/4 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.4e-05 | row bits independent of the batch: yes | device 0.221 ms
+xbatch fmt=5/5 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.33e-05 | row bits independent of the batch: yes | device 0.220 ms
+xbatch fmt=7/7 gs=32 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.56e-05 | row bits independent of the batch: yes | device 0.286 ms
+xbatch fmt=10/10 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.84e-05 | row bits independent of the batch: yes | device 0.873 ms
+xbatch fmt=11/11 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.33e-05 | row bits independent of the batch: yes | device 0.260 ms
+xbatch fmt=12/12 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.79e-05 | row bits independent of the batch: yes | device 0.279 ms
+xbatch fmt=13/13 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.3e-05 | row bits independent of the batch: yes | device 0.246 ms
+xbatch fmt=4/1 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.52e-05 | row bits independent of the batch: yes | device 0.219 ms
+xbatch fmt=4/4 gs=64 D=320 I=160 swiglu-limit, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.52e-05 | row bits independent of the batch: yes | device 0.239 ms
+xbatch fmt=7/7 gs=32 D=320 I=160 situ, rows 1/3/2/20/1 (GEMM from 16) | maxrel=6.7e-05 | row bits independent of the batch: yes | device 0.293 ms
+xbatch fmt=12/12 gs=8 D=200 I=72 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.12e-05 | row bits independent of the batch: yes | device 0.224 ms
+xbatch fmt=2/2 gs=0 D=200 I=72 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.11e-05 | row bits independent of the batch: yes | device 0.178 ms
+xbatch fmt=4/4 gs=64 D=6400 I=64 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=2.74e-05 | row bits independent of the batch: yes | device 2.772 ms
+xbatch v4 D=160 I=160, rows 1/3/20 (GEMM from 16) | 0 of 3840 values differ from the CPU's arithmetic | device 0.197 ms
+PASS
+[VK] VRAM pressure-proofing: memory_priority on, memory_budget on
+[VK] warning: only 256 of 7936 MB VRAM is host-visible (Resizable BAR appears disabled) — allocations beyond the 256 MB window fall back to system RAM and will be slow. Enable Resizable BAR / Smart Access Memory in the BIOS.
+[VK] ready: AMD Radeon Pro 580X (RADV POLARIS10), compute qfam 0, memtype 3, fused gate+up, absorb attention, tiled GEMM from S=2 and S*O>=4096
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.5 MiB = 20 experts of 73.8 KiB (fmt 1, down fmt 1), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.6 MiB = 20 experts of 81.0 KiB (fmt 13 gs 32, down fmt 13 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 773.9 KiB = 20 experts of 37.8 KiB (fmt 2, down fmt 2), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.1 MiB = 20 experts of 54.0 KiB (fmt 4 gs 64, down fmt 13 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 773.9 KiB = 20 experts of 37.8 KiB (fmt 2, down fmt 2), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 922.5 KiB = 20 experts of 45.0 KiB (fmt 4 gs 32, down fmt 4 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 773.9 KiB = 20 experts of 37.8 KiB (fmt 2, down fmt 2), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 830.2 KiB = 20 experts of 40.5 KiB (fmt 4 gs 64, down fmt 4 gs 64), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 830.2 KiB = 20 experts of 40.5 KiB (fmt 4 gs 64, down fmt 4 gs 64), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 645.8 KiB = 20 experts of 31.5 KiB (fmt 5, down fmt 5), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 922.5 KiB = 20 experts of 45.0 KiB (fmt 7 gs 32, down fmt 7 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 922.5 KiB = 20 experts of 45.0 KiB (fmt 7 gs 32, down fmt 7 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.6 MiB = 20 experts of 81.0 KiB (fmt 12 gs 32, down fmt 12 gs 32), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.5 MiB = 20 experts of 74.8 KiB (fmt 12 gs 128, down fmt 12 gs 128), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 2.9 MiB = 20 experts of 144.8 KiB (fmt 11, down fmt 11), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 5.8 MiB = 20 experts of 288.8 KiB (fmt 10, down fmt 10), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 303.8 KiB = 7 experts of 40.5 KiB (fmt 4 gs 64, down fmt 4 gs 64), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 526.5 KiB = 6 experts of 81.0 KiB (fmt 12 gs 32, down fmt 12 gs 32), device memory, own queue, up to 4 promotions per token
+[VK] tier test test: device 6751 of 12000 routed experts (56.3%; this test 6751 of 12000) | CPU RAM hits 0, disk loads 0 | resident 6 (budget 6, 486.0 KiB of 526.5 KiB, 1 blocks, frag 0.37) | uploads 13 (936.0 KiB, 0 warm), evictions 7, skipped 0 queue + 0 rate, failed 0 | device 61.9 ms, CPU share 166.2 ms, waited 14.2 ms (77% of device time hidden)
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 1.5 MiB = 20 experts of 73.8 KiB (fmt 1, down fmt 1), device memory, own queue, up to 64 promotions per token
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 184.4 KiB = 2 experts of 73.8 KiB (fmt 1, down fmt 1), device memory, own queue, up to 64 promotions per token, uploads awaited (COLI_VK_TIER_SYNC)
+[VK] tier test test: device 82 of 156 routed experts (52.6%; this test 82 of 156) | CPU RAM hits 0, disk loads 0 | resident 2 (budget 2, 147.5 KiB of 184.4 KiB, 1 blocks, frag 0.00) | uploads 3 (216.0 KiB, 0 warm), evictions 1, skipped 0 queue + 0 rate, failed 0 | device 1.4 ms, CPU share 3.1 ms, waited 0.4 ms (69% of device time hidden)
+[VK] tier test: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 922.5 KiB = 20 experts of 45.0 KiB (fmt 7 gs 32, down fmt 7 gs 32), device memory, own queue, up to 64 promotions per token
+formats:
+  int8 per row                       device 264 of 306 assignments, worst relative error 3.55e-07
+  int8 gs32                          device 270 of 306 assignments, worst relative error 3.39e-07
+  unpacked int4 per row              device 269 of 306 assignments, worst relative error 3.56e-07
+  unpacked int4 gs64, int8 down      device 273 of 306 assignments, worst relative error 3.67e-07
+  signed int4 pairs per row          device 259 of 306 assignments, worst relative error 3.56e-07
+  signed int4 pairs gs32             device 259 of 306 assignments, worst relative error 3.43e-07
+  int4 v+8 per row                   device 266 of 306 assignments, worst relative error 3.12e-07
+  int4 v+8 gs64, SwiGLU limit        device 265 of 306 assignments, worst relative error 3.00e-07
+  planar int4-g64                    device 271 of 306 assignments, worst relative error 3.08e-07
+  int3-g64                           device 261 of 306 assignments, worst relative error 2.98e-07
+  MXFP4 f32 scales                   device 263 of 306 assignments, worst relative error 3.22e-07
+  MXFP4 ue8m0, SiTU-GLU              device 268 of 306 assignments, worst relative error 1.20e-06
+  fp8 gs32                           device 264 of 306 assignments, worst relative error 3.25e-07
+  fp8 128x128 blocks                 device 267 of 306 assignments, worst relative error 3.24e-07
+  bf16                               device 268 of 306 assignments, worst relative error 3.80e-07
+  f32                                device 263 of 306 assignments, worst relative error 3.16e-07
+warm:
+  warm start: 7 experts planned in heat order and resident, the hottest served by the device
+adapt:
+  adapt: phase A device 73%, resident A 6; phase B device 33% then 71%, resident B 6, A 0, all 6 (budget 6)
+partial:
+  partial: a step of 24 assignments, the device took 5 (max_rows 5), relative error 1.93e-07
+sync:
+  sync: phase A resident 2 of 2; phase B device 60 of 120, resident 0 1, 1 0, 5 1, all 2 (budget 2), evictions 1, failed 0
+DeepSeek V4:
+  MXFP4 ue8m0, DeepSeek V4 roundings device 261 of 306 assignments, 261 rows bit-identical to the CPU's arithmetic, worst row 0.00e+00, worst sum 0.00e+00
+PASS

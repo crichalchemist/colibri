@@ -1,0 +1,3 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN -c backend_vulkan.c -o backend_vulkan.o
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN -c vk_tier.c -o vk_tier.o
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN tests/test_vk_tier.c backend_vulkan.o vk_tier.o -o tests/test_vk_tier -lm -fopenmp -pthread  -lvulkan

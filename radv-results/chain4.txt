@@ -1,0 +1,3 @@
+pinned ready: diffusers 0.41.0.dev0 QwenImage21 classes importable
+mimo-qwenimage rerun2 exit=0 (29s) last='OK'
+CHAIN4 COMPLETE

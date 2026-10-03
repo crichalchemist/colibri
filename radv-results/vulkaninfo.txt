@@ -1,0 +1,56 @@
+# Step 0 record (RADV visit 1) — collected 2026-10-03T08:09:30-05:00
+host: frank | Ubuntu 26.04.1 LTS | kernel 7.0.0-38-generic
+gpu: 01:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/570X/580/580X/590] [1002:67df] (rev c0)
+mesa/radv: mesa-vulkan-drivers 26.0.8-1ubuntu0.3
+loader: libvulkan1 1.4.341.0-1
+glslc: shaderc 2026.1-1
+cc: cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+icd: /usr/share/vulkan/icd.d/radeon_icd.json  (NOTE: handoff said radeon_icd.x86_64.json — that file does not exist on Ubuntu 26.04)
+vram_total_bytes:        8589934592
+vis_vram_total_bytes:    268435456  (BAR window)
+lspci BAR0: Memory at c0000000 (64-bit, prefetchable) [size=256M]
+vulkaninfo: NOT INSTALLED at collection time (vulkan-tools pending sudo apt)
+
+=== vulkaninfo --summary (device lines) ===
+	apiVersion         = 1.4.335
+	deviceType         = PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+	deviceName         = AMD Radeon Pro 580X (RADV POLARIS10)
+	driverName         = radv
+	driverInfo         = Mesa 26.0.8-1ubuntu0.3
+	conformanceVersion = 1.4.0.0
+
+=== memoryHeaps ===
+memoryHeaps: count = 3
+	memoryHeaps[0]:
+		size   = 8321499136 (0x1f0000000) (7.75 GiB)
+		budget = 7651725312 (0x1c8141000) (7.13 GiB)
+		usage  = 0 (0x00000000) (0.00 B)
+		flags: count = 1
+			MEMORY_HEAP_DEVICE_LOCAL_BIT
+	memoryHeaps[1]:
+		size   = 32449380352 (0x78e224000) (30.22 GiB)
+		budget = 32352694272 (0x7885ef000) (30.13 GiB)
+		usage  = 0 (0x00000000) (0.00 B)
+		flags:
+			None
+	memoryHeaps[2]:
+		size   = 268435456 (0x10000000) (256.00 MiB)
+		budget = 61485056 (0x03aa3000) (58.64 MiB)
+		usage  = 0 (0x00000000) (0.00 B)
+		flags: count = 1
+			MEMORY_HEAP_DEVICE_LOCAL_BIT
+memoryTypes: count = 7
+	memoryTypes[0]:
+		heapIndex     = 0
+		propertyFlags = 0x0001: count = 1
+			MEMORY_PROPERTY_DEVICE_LOCAL_BIT
+		usable for:
+			IMAGE_TILING_OPTIMAL:
+
+=== subgroup size control ===
+	minSubgroupSize                                                               = 64
+	maxSubgroupSize                                                               = 64
+	maxComputeWorkgroupSubgroups                                                  = 4294967295
+	requiredSubgroupSizeStages:
+	subgroupSizeControl                                = true
+	computeFullSubgroups                               = true

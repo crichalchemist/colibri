@@ -1,0 +1,594 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN deepseek_v41.c backend_vulkan.o vk_tier.o -o deepseek_v41 -lm -fopenmp -pthread  -lvulkan
+ref -> dsv41_tiny/ref.json
+  prompt [177, 108, 28, 250, 26, 4, 230, 64]...  output [99, 198, 37, 99, 224, 192, 159, 28]
+  dspark drafts [198, 110, 179, 179] ...
+container -> dsv41_tiny  (3.16 MB)
+ref -> dsv41_long/ref.json
+  prompt [177, 108, 28, 250, 26, 4, 230, 64]...  output [138, 30, 116, 85, 14, 188]
+  dspark drafts [30, 164, 108, 108] ...
+container -> dsv41_long  (3.16 MB)
+OK deepseek_v41 cap=1: output = CPU, 817 matmuls on the GPU, device 79 of 228 routed experts
+OK deepseek_v41 cap=2: output = CPU, 817 matmuls on the GPU, device 228 of 228 routed experts
+OK deepseek_v41 cap=8: output = CPU, 817 matmuls on the GPU, device 228 of 228 routed experts
+OK deepseek_v41 40-token prompt cap=2: output = CPU, 712 matmuls on the GPU, device 152 of 540 routed experts
+OK deepseek_v41 40-token prompt cap=8: output = CPU, 712 matmuls on the GPU, device 540 of 540 routed experts
+OK deepseek_v41 DSpark spec=1: output = CPU, 404 matmuls on the GPU, device 240 of 240 routed experts
+OK deepseek_v41 DSpark spec=2: output = CPU, 404 matmuls on the GPU, device 251 of 252 routed experts
+OK deepseek_v41 DSpark spec=3: output = CPU, 835 matmuls on the GPU, device 405 of 408 routed experts
+OK deepseek_v41 DSpark spec=4: output = CPU, 835 matmuls on the GPU, device 407 of 408 routed experts
+OK deepseek_v41 DSpark spec=5: output = CPU, 512 matmuls on the GPU, device 300 of 300 routed experts
+OK deepseek_v41 tier cap=1: output = CPU, device 79 of 228 routed experts, evictions 0
+OK deepseek_v41 tier cap=2: output = CPU, device 79 of 228 routed experts, evictions 0
+OK deepseek_v41 tier cap=8: output = CPU, device 79 of 228 routed experts, evictions 0
+OK deepseek_v41 tier 40-token prompt cap=2: output = CPU, device 154 of 540 routed experts, evictions 0
+OK deepseek_v41 tier 40-token prompt cap=8: output = CPU, device 154 of 540 routed experts, evictions 0
+OK deepseek_v41 tier DSpark spec=1: output = CPU, device 90 of 240 routed experts, evictions 0
+OK deepseek_v41 tier DSpark spec=2: output = CPU, device 101 of 252 routed experts, evictions 0
+OK deepseek_v41 tier DSpark spec=3: output = CPU, device 254 of 408 routed experts, evictions 0
+OK deepseek_v41 tier DSpark spec=4: output = CPU, device 254 of 408 routed experts, evictions 0
+OK deepseek_v41 tier DSpark spec=5: output = CPU, device 146 of 300 routed experts, evictions 0
+OK deepseek_v41 tier a budget of three experts: output = CPU, device 11 of 540 routed experts, evictions 4
+OK deepseek_v41 tier trunk on the device too: output = CPU, device 154 of 540 routed experts, evictions 0
+python3 tools/make_deepseek_v4_tiny.py \
+	--output ./deepseek_v4_tiny --force
+[target] 180 tensors
+  embed.weight: [128, 128] torch.bfloat16
+  head.weight: [128, 128] torch.bfloat16
+  norm.weight: [128] torch.bfloat16
+  hc_head_fn: [2, 256] torch.float32
+  hc_head_base: [2] torch.float32
+  hc_head_scale: [1] torch.float32
+  layers.0.attn.attn_sink: [4] torch.float32
+  layers.0.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.0.attn.q_norm.weight: [128] torch.bfloat16
+  layers.0.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.0.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn_norm.weight: [128] torch.bfloat16
+  layers.0.ffn.gate.weight: [4, 128] torch.bfloat16
+  layers.0.ffn.gate.tid2eid: [128, 2] torch.int64
+  layers.0.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn_norm.weight: [128] torch.bfloat16
+  layers.0.hc_attn_base: [8] torch.float32
+  layers.0.hc_attn_fn: [8, 256] torch.float32
+  layers.0.hc_attn_scale: [3] torch.float32
+  layers.0.hc_ffn_base: [8] torch.float32
+  layers.0.hc_ffn_fn: [8, 256] torch.float32
+  layers.0.hc_ffn_scale: [3] torch.float32
+  layers.0.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w3.weight: [128, 64] torch.int8
+  layers.1.attn.attn_sink: [4] torch.float32
+  layers.1.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.1.attn.q_norm.weight: [128] torch.bfloat16
+  layers.1.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.1.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn_norm.weight: [128] torch.bfloat16
+  layers.1.attn.compressor.ape: [4, 64] torch.float32
+  layers.1.attn.compressor.norm.weight: [32] torch.bfloat16
+  layers.1.attn.compressor.wgate.weight: [64, 128] torch.bfloat16
+  layers.1.attn.compressor.wkv.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.compressor.ape: [4, 64] torch.float32
+  layers.1.attn.indexer.compressor.norm.weight: [32] torch.bfloat16
+  layers.1.attn.indexer.compressor.wgate.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.compressor.wkv.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.weights_proj.weight: [2, 128] torch.bfloat16
+  layers.1.attn.indexer.wq_b.weight: [64, 128] torch.float8_e4m3fn
+  layers.1.attn.indexer.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.gate.weight: [4, 128] torch.bfloat16
+  layers.1.ffn.gate.bias: [4] torch.float32
+  layers.1.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn_norm.weight: [128] torch.bfloat16
+  layers.1.hc_attn_base: [8] torch.float32
+  layers.1.hc_attn_fn: [8, 256] torch.float32
+  layers.1.hc_attn_scale: [3] torch.float32
+  layers.1.hc_ffn_base: [8] torch.float32
+  layers.1.hc_ffn_fn: [8, 256] torch.float32
+  layers.1.hc_ffn_scale: [3] torch.float32
+  layers.1.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w3.weight: [128, 64] torch.int8
+  layers.2.attn.attn_sink: [4] torch.float32
+  layers.2.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.2.attn.q_norm.weight: [128] torch.bfloat16
+  layers.2.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.2.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn_norm.weight: [128] torch.bfloat16
+  layers.2.attn.compressor.ape: [8, 32] torch.float32
+  layers.2.attn.compressor.norm.weight: [32] torch.bfloat16
+  layers.2.attn.compressor.wgate.weight: [32, 128] torch.bfloat16
+  layers.2.attn.compressor.wkv.weight: [32, 128] torch.bfloat16
+  layers.2.ffn.gate.weight: [4, 128] torch.bfloat16
+  layers.2.ffn.gate.bias: [4] torch.float32
+  layers.2.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn_norm.weight: [128] torch.bfloat16
+  layers.2.hc_attn_base: [8] torch.float32
+  layers.2.hc_attn_fn: [8, 256] torch.float32
+  layers.2.hc_attn_scale: [3] torch.float32
+  layers.2.hc_ffn_base: [8] torch.float32
+  layers.2.hc_ffn_fn: [8, 256] torch.float32
+  layers.2.hc_ffn_scale: [3] torch.float32
+  layers.2.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w3.weight: [128, 64] torch.int8
+wrote /home/crichalchemist/colibri-radv/c/deepseek_v4_tiny (928662 bytes, transformers=5.16.1)
+make -f Makefile.deepseek-v4 deepseek-v4-clean
+make[1]: Entering directory '/home/crichalchemist/colibri-radv/c'
+rm -f deepseek_v4 COLI_V4_UNIT_ST.o COLI_V4_UNIT_CONFIG.o COLI_V4_UNIT_LAYER_RESIDENT.o COLI_V4_UNIT_RESOURCE_PLAN.o COLI_V4_UNIT_HEAD_CACHE.o COLI_V4_UNIT_EXPERT_STORE_AUTO.o COLI_V4_UNIT_NATIVE_QUANT.o COLI_V4_UNIT_NATIVE_QUANT_DUAL.o COLI_V4_UNIT_NATIVE_QUANT_BATCH.o COLI_V4_UNIT_NATIVE_QUANT_ROWS16.o COLI_V4_UNIT_MATH.o COLI_V4_UNIT_ATTENTION.o COLI_V4_UNIT_ATTENTION_BATCH.o COLI_V4_UNIT_COMPRESSOR.o COLI_V4_UNIT_INDEXER.o COLI_V4_UNIT_SPARSE_ATTENTION.o COLI_V4_UNIT_BLOCK_HYBRID.o COLI_V4_UNIT_COMPRESSOR_SNAPSHOT.o COLI_V4_UNIT_INDEXER_SNAPSHOT.o COLI_V4_UNIT_ATTENTION_TRANSACTION.o COLI_V4_UNIT_EXPERT_STORE_HOT_ROWS16.o COLI_V4_UNIT_EXPERT_ROWS16.o COLI_V4_UNIT_ROUTE_BF16.o COLI_V4_UNIT_RUNTIME.o COLI_V4_UNIT_GPU.o COLI_V4_UNIT_PROMPT.o COLI_V4_UNIT_GENERATE_STATS.o  expert_store_registry.o backend_vulkan_v4.o vk_tier_v4.o COLI_V4_UNIT_KV_CACHE.o COLI_V4_UNIT_ATTENTION_CACHE.o COLI_V4_UNIT_EXPERT.o COLI_V4_UNIT_EXPERT_STORE.o COLI_V4_UNIT_LAYER.o COLI_V4_UNIT_EXPERT_STORE_HOT_ROWS16_TEST.o \
+	COLI_V4_UNIT_NATIVE_QUANT_BATCH_TEST.o \
+	tests/test_v4_serve_framing test_expert_store_registry deepseek_v4.cflags \
+	deepseek_v4.cudaflags backend_vulkan_v4.o vk_tier_v4.o
+make[1]: Leaving directory '/home/crichalchemist/colibri-radv/c'
+make -f Makefile.deepseek-v4 ARCH=native deepseek-v4
+make[1]: Entering directory '/home/crichalchemist/colibri-radv/c'
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_ST -c deepseek_v4.c -o COLI_V4_UNIT_ST.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_CONFIG -c deepseek_v4.c -o COLI_V4_UNIT_CONFIG.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_LAYER_RESIDENT -c deepseek_v4.c -o COLI_V4_UNIT_LAYER_RESIDENT.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_RESOURCE_PLAN -c deepseek_v4.c -o COLI_V4_UNIT_RESOURCE_PLAN.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_HEAD_CACHE -c deepseek_v4.c -o COLI_V4_UNIT_HEAD_CACHE.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_EXPERT_STORE_AUTO -c deepseek_v4.c -o COLI_V4_UNIT_EXPERT_STORE_AUTO.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_NATIVE_QUANT -c deepseek_v4.c -o COLI_V4_UNIT_NATIVE_QUANT.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_NATIVE_QUANT_DUAL -c deepseek_v4.c -o COLI_V4_UNIT_NATIVE_QUANT_DUAL.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_NATIVE_QUANT_BATCH -c deepseek_v4.c -o COLI_V4_UNIT_NATIVE_QUANT_BATCH.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_NATIVE_QUANT_ROWS16 -c deepseek_v4.c -o COLI_V4_UNIT_NATIVE_QUANT_ROWS16.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_MATH -c deepseek_v4.c -o COLI_V4_UNIT_MATH.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_ATTENTION -c deepseek_v4.c -o COLI_V4_UNIT_ATTENTION.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_ATTENTION_BATCH -c deepseek_v4.c -o COLI_V4_UNIT_ATTENTION_BATCH.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_COMPRESSOR -c deepseek_v4.c -o COLI_V4_UNIT_COMPRESSOR.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_INDEXER -c deepseek_v4.c -o COLI_V4_UNIT_INDEXER.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_SPARSE_ATTENTION -c deepseek_v4.c -o COLI_V4_UNIT_SPARSE_ATTENTION.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_BLOCK_HYBRID -c deepseek_v4.c -o COLI_V4_UNIT_BLOCK_HYBRID.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_COMPRESSOR_SNAPSHOT -c deepseek_v4.c -o COLI_V4_UNIT_COMPRESSOR_SNAPSHOT.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_INDEXER_SNAPSHOT -c deepseek_v4.c -o COLI_V4_UNIT_INDEXER_SNAPSHOT.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_ATTENTION_TRANSACTION -c deepseek_v4.c -o COLI_V4_UNIT_ATTENTION_TRANSACTION.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_EXPERT_STORE_HOT_ROWS16 -c deepseek_v4.c -o COLI_V4_UNIT_EXPERT_STORE_HOT_ROWS16.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_EXPERT_ROWS16 -c deepseek_v4.c -o COLI_V4_UNIT_EXPERT_ROWS16.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_ROUTE_BF16 -c deepseek_v4.c -o COLI_V4_UNIT_ROUTE_BF16.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_RUNTIME -c deepseek_v4.c -o COLI_V4_UNIT_RUNTIME.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_GPU -c deepseek_v4.c -o COLI_V4_UNIT_GPU.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_PROMPT -c deepseek_v4.c -o COLI_V4_UNIT_PROMPT.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -DCOLI_V4_UNIT_GENERATE_STATS -c deepseek_v4.c -o COLI_V4_UNIT_GENERATE_STATS.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -c expert_store_registry.c -o expert_store_registry.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -c backend_vulkan.c -o backend_vulkan_v4.o
+gcc -D_GNU_SOURCE -O3 -march=native -fopenmp -pthread -include pthread.h -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -DCOLI_V4_MAX_PIN_SLOTS_PER_LAYER=16 -DCOLI_V4_PIN_RAMP_REQUESTS=24 -DCOLI_V4_EXPERIMENTAL_DUAL_EXPERT_LOADER  -flto -DCOLI_VULKAN -c vk_tier.c -o vk_tier_v4.o
+gcc COLI_V4_UNIT_ST.o COLI_V4_UNIT_CONFIG.o COLI_V4_UNIT_LAYER_RESIDENT.o COLI_V4_UNIT_RESOURCE_PLAN.o COLI_V4_UNIT_HEAD_CACHE.o COLI_V4_UNIT_EXPERT_STORE_AUTO.o COLI_V4_UNIT_NATIVE_QUANT.o COLI_V4_UNIT_NATIVE_QUANT_DUAL.o COLI_V4_UNIT_NATIVE_QUANT_BATCH.o COLI_V4_UNIT_NATIVE_QUANT_ROWS16.o COLI_V4_UNIT_MATH.o COLI_V4_UNIT_ATTENTION.o COLI_V4_UNIT_ATTENTION_BATCH.o COLI_V4_UNIT_COMPRESSOR.o COLI_V4_UNIT_INDEXER.o COLI_V4_UNIT_SPARSE_ATTENTION.o COLI_V4_UNIT_BLOCK_HYBRID.o COLI_V4_UNIT_COMPRESSOR_SNAPSHOT.o COLI_V4_UNIT_INDEXER_SNAPSHOT.o COLI_V4_UNIT_ATTENTION_TRANSACTION.o COLI_V4_UNIT_EXPERT_STORE_HOT_ROWS16.o COLI_V4_UNIT_EXPERT_ROWS16.o COLI_V4_UNIT_ROUTE_BF16.o COLI_V4_UNIT_RUNTIME.o COLI_V4_UNIT_GPU.o COLI_V4_UNIT_PROMPT.o COLI_V4_UNIT_GENERATE_STATS.o  expert_store_registry.o backend_vulkan_v4.o vk_tier_v4.o -o deepseek_v4 -lm -fopenmp -pthread  -flto -lvulkan
+lto-wrapper: warning: using serial compilation of 6 LTRANS jobs
+lto-wrapper: note: see the ‘-flto’ option documentation for more information
+make[1]: Leaving directory '/home/crichalchemist/colibri-radv/c'
+python3 tests/test_deepseek_v4_tiny.py \
+	--binary ./deepseek_v4 \
+	--fixture ./deepseek_v4_tiny
+[OMP] deepseek-v4: effective team size 8
+ram_tiers available=55.11GiB dense=resident(0.00GiB) target_slots=4 target_cache=0.00GiB head=resident-bf16 projected=4.50GiB
+v4_open index=0.00s plan=0.00s (index built once, reused by plan/inventory/head)
+v4_ssd_io mode=direct-aligned fallback=buffered-pread
+v4_autopin history=/home/crichalchemist/colibri-radv/c/deepseek_v4_tiny/.coli_usage selections=6422
+v4_hot_policy pin_slots_per_layer=0 repin_interval=4 mode=resident-ram rows16=hot-pins
+[VK] VRAM pressure-proofing: memory_priority on, memory_budget on
+[VK] warning: only 256 of 7936 MB VRAM is host-visible (Resizable BAR appears disabled) — allocations beyond the 256 MB window fall back to system RAM and will be slow. Enable Resizable BAR / Smart Access Memory in the BIOS.
+[VK] ready: AMD Radeon Pro 580X (RADV POLARIS10), compute qfam 0, memtype 3, fused gate+up, absorb attention, tiled GEMM from S=2 and S*O>=4096
+[VK] deepseek_v4: device ready, dense matrices on the device (default)
+[VK] tier deepseek_v4: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 6.18 GiB = 12 experts of 30.0 KiB (fmt 7 gs 32, down fmt 7 gs 32), device memory, own queue, up to 16 promotions per token, balanced against the CPU
+[VK] tier deepseek_v4: warm start, 12 experts from the history in 0.0s
+v4_dense_resident layers=3 bytes=0.000GiB
+[VK] tier deepseek_v4 turn: device 90 of 90 routed experts (100.0%; this turn 90 of 90) | CPU RAM hits 0, disk loads 0 | resident 12 (budget 12, 360.0 KiB of 6.18 GiB, 1 blocks, frag 0.00) | uploads 12 (288.0 KiB, 12 warm), evictions 0, skipped 0 queue + 0 rate, failed 0 | device 2.0 ms, CPU share 14.9 ms, waited 0.1 ms (96% of device time hidden) | balance: device share 1.00, 0 rows handed to the CPU
+[VK] tier deepseek_v4 turn: device 180 of 180 routed experts (100.0%; this turn 90 of 90) | CPU RAM hits 0, disk loads 0 | resident 12 (budget 12, 360.0 KiB of 6.18 GiB, 1 blocks, frag 0.00) | uploads 12 (288.0 KiB, 12 warm), evictions 0, skipped 0 queue + 0 rate, failed 0 | device 4.0 ms, CPU share 26.9 ms, waited 0.1 ms (97% of device time hidden) | balance: device share 1.00, 0 rows handed to the CPU
+[VK] tier deepseek_v4 run: device 180 of 180 routed experts (100.0%; this run 0 of 0) | CPU RAM hits 0, disk loads 0 | resident 12 (budget 12, 360.0 KiB of 6.18 GiB, 1 blocks, frag 0.00) | uploads 12 (288.0 KiB, 12 warm), evictions 0, skipped 0 queue + 0 rate, failed 0 | device 4.0 ms, CPU share 26.9 ms, waited 0.1 ms (97% of device time hidden) | balance: device share 1.00, 0 rows handed to the CPU
+[VK] deepseek_v4: 560 matmuls on the GPU
+[VK] deepseek_v4: 35 resident matrices on the device, 0.5 MiB (fp8 as fmt 12, bf16 as fmt 11)
+[STATS] 6602 selections across 12 distinct experts -> /home/crichalchemist/colibri-radv/c/deepseek_v4_tiny/.coli_usage
+v4_rows16 packed_slots=0
+v4_direct reads=12 flock_reads=12 fallbacks=0 payload_bytes=313344
+PASS target short: teacher forcing and greedy token-exact
+PASS target greedy: truncated prefix rejected
+PASS target compressed: teacher forcing and greedy token-exact
+PASS target long: teacher forcing and greedy token-exact
+PASS target session short: exact IDs and exact length
+PASS target session short: exact IDs and exact length
+PASS target session short: exact IDs and exact length
+PASS target session long: exact IDs and exact length
+PASS target CLI: TUNE decode line is present and parseable
+PASS target CLI: prompt beyond the old 512-token cap
+SKIP mtp draft gpu=False: fixture has no 3-stage MTP profile
+SKIP mtp draft gpu=True: fixture has no 3-stage MTP profile
+PASS target serve: persistent SUBMIT/DATA/DONE protocol is token-exact, PROF phases filled
+PASS tiny DeepSeek V4 target oracle: all checks completed
+python3 tests/test_deepseek_v4_prefix.py \
+	--binary /home/crichalchemist/colibri-radv/c/deepseek_v4 \
+	--fixture /home/crichalchemist/colibri-radv/c/deepseek_v4_tiny
+PASS prefix reuse: 11 tokens reused, output identical to a cold prefill
+PASS prefix repeat: identical prompt re-prefills, answer unchanged
+PASS prefix reset: divergent prompt re-prefills and matches cold
+PASS DeepSeek V4 KV prefix reuse: all checks completed
+python3 tests/test_deepseek_v4_brio.py \
+	--binary /home/crichalchemist/colibri-radv/c/deepseek_v4 \
+	--fixture /home/crichalchemist/colibri-radv/c/deepseek_v4_tiny
+PASS read-only: 7 ECHO frames, zero generated tokens
+PASS echo is the head: best ECHO token == greedy token from the same prefix
+PASS pin: both options reused 8 tokens and read the pinned predictor, equal to a cold prefill
+PASS generation: 4 tokens unchanged, each DATA frame with its tail
+PASS DeepSeek V4 numeric channel: all checks completed
+[OMP] deepseek-v4: effective team size 8
+ram_tiers available=55.14GiB dense=resident(0.00GiB) target_slots=4 target_cache=0.00GiB head=resident-bf16 projected=4.50GiB
+v4_open index=0.00s plan=0.00s (index built once, reused by plan/inventory/head)
+v4_ssd_io mode=direct-aligned fallback=buffered-pread
+v4_autopin history=./deepseek_v4_tiny/.coli_usage selections=7454
+v4_hot_policy pin_slots_per_layer=0 repin_interval=4 mode=resident-ram rows16=hot-pins
+v4_cli mode=raw memory=auto target_only=1
+v4_dense_resident layers=3 bytes=0.000GiB
+v4_tokens prompt=72 generated=4 total=76 expert_requests=30 hits=18 misses=12 hit_rate=60.000 bytes=313344 target_only=1
+generated_text=<t011><t012><t013><t014>
+timing time_to_first_token=0.022s after_first=0.002s
+wrote oracle v4-cpu.json (source=coli-self, continuation_self_check=4/4)
+[STATS] 7496 selections across 12 distinct experts -> ./deepseek_v4_tiny/.coli_usage
+v4_rows16 packed_slots=0
+v4_direct reads=12 flock_reads=12 fallbacks=0 payload_bytes=313344
+OK deepseek_v4 session: ids = CPU = reference
+OK deepseek_v4: 250 matmuls on the GPU, device 906 of 906 routed experts
+[target] 252 tensors
+  embed.weight: [128, 128] torch.bfloat16
+  head.weight: [128, 128] torch.bfloat16
+  norm.weight: [128] torch.bfloat16
+  hc_head_fn: [2, 256] torch.float32
+  hc_head_base: [2] torch.float32
+  hc_head_scale: [1] torch.float32
+  layers.0.attn.attn_sink: [4] torch.float32
+  layers.0.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.0.attn.q_norm.weight: [128] torch.bfloat16
+  layers.0.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.0.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.attn_norm.weight: [128] torch.bfloat16
+  layers.0.ffn.gate.weight: [8, 128] torch.bfloat16
+  layers.0.ffn.gate.tid2eid: [128, 2] torch.int64
+  layers.0.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.0.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.0.ffn_norm.weight: [128] torch.bfloat16
+  layers.0.hc_attn_base: [8] torch.float32
+  layers.0.hc_attn_fn: [8, 256] torch.float32
+  layers.0.hc_attn_scale: [3] torch.float32
+  layers.0.hc_ffn_base: [8] torch.float32
+  layers.0.hc_ffn_fn: [8, 256] torch.float32
+  layers.0.hc_ffn_scale: [3] torch.float32
+  layers.0.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.3.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.4.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.4.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.4.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.4.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.4.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.4.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.5.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.5.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.5.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.5.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.5.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.5.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.6.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.6.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.6.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.6.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.6.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.6.w3.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.7.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.7.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.7.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.0.ffn.experts.7.w1.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.7.w2.weight: [128, 64] torch.int8
+  layers.0.ffn.experts.7.w3.weight: [128, 64] torch.int8
+  layers.1.attn.attn_sink: [4] torch.float32
+  layers.1.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.1.attn.q_norm.weight: [128] torch.bfloat16
+  layers.1.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.1.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.attn_norm.weight: [128] torch.bfloat16
+  layers.1.attn.compressor.ape: [4, 64] torch.float32
+  layers.1.attn.compressor.norm.weight: [32] torch.bfloat16
+  layers.1.attn.compressor.wgate.weight: [64, 128] torch.bfloat16
+  layers.1.attn.compressor.wkv.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.compressor.ape: [4, 64] torch.float32
+  layers.1.attn.indexer.compressor.norm.weight: [32] torch.bfloat16
+  layers.1.attn.indexer.compressor.wgate.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.compressor.wkv.weight: [64, 128] torch.bfloat16
+  layers.1.attn.indexer.weights_proj.weight: [2, 128] torch.bfloat16
+  layers.1.attn.indexer.wq_b.weight: [64, 128] torch.float8_e4m3fn
+  layers.1.attn.indexer.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.gate.weight: [8, 128] torch.bfloat16
+  layers.1.ffn.gate.bias: [8] torch.float32
+  layers.1.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.1.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.1.ffn_norm.weight: [128] torch.bfloat16
+  layers.1.hc_attn_base: [8] torch.float32
+  layers.1.hc_attn_fn: [8, 256] torch.float32
+  layers.1.hc_attn_scale: [3] torch.float32
+  layers.1.hc_ffn_base: [8] torch.float32
+  layers.1.hc_ffn_fn: [8, 256] torch.float32
+  layers.1.hc_ffn_scale: [3] torch.float32
+  layers.1.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.3.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.4.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.4.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.4.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.4.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.4.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.4.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.5.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.5.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.5.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.5.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.5.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.5.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.6.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.6.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.6.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.6.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.6.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.6.w3.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.7.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.7.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.7.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.1.ffn.experts.7.w1.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.7.w2.weight: [128, 64] torch.int8
+  layers.1.ffn.experts.7.w3.weight: [128, 64] torch.int8
+  layers.2.attn.attn_sink: [4] torch.float32
+  layers.2.attn.kv_norm.weight: [32] torch.bfloat16
+  layers.2.attn.q_norm.weight: [128] torch.bfloat16
+  layers.2.attn.wkv.weight: [32, 128] torch.float8_e4m3fn
+  layers.2.attn.wkv.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wo_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wo_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wo_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wo_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wq_a.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wq_a.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn.wq_b.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.attn.wq_b.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.attn_norm.weight: [128] torch.bfloat16
+  layers.2.attn.compressor.ape: [8, 32] torch.float32
+  layers.2.attn.compressor.norm.weight: [32] torch.bfloat16
+  layers.2.attn.compressor.wgate.weight: [32, 128] torch.bfloat16
+  layers.2.attn.compressor.wkv.weight: [32, 128] torch.bfloat16
+  layers.2.ffn.gate.weight: [8, 128] torch.bfloat16
+  layers.2.ffn.gate.bias: [8] torch.float32
+  layers.2.ffn.shared_experts.w1.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w1.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn.shared_experts.w2.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w2.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn.shared_experts.w3.weight: [128, 128] torch.float8_e4m3fn
+  layers.2.ffn.shared_experts.w3.scale: [1, 1] torch.float8_e8m0fnu
+  layers.2.ffn_norm.weight: [128] torch.bfloat16
+  layers.2.hc_attn_base: [8] torch.float32
+  layers.2.hc_attn_fn: [8, 256] torch.float32
+  layers.2.hc_attn_scale: [3] torch.float32
+  layers.2.hc_ffn_base: [8] torch.float32
+  layers.2.hc_ffn_fn: [8, 256] torch.float32
+  layers.2.hc_ffn_scale: [3] torch.float32
+  layers.2.ffn.experts.0.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.0.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.0.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.0.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.1.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.1.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.2.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.2.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.3.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.3.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.4.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.4.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.4.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.4.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.4.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.4.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.5.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.5.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.5.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.5.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.5.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.5.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.6.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.6.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.6.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.6.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.6.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.6.w3.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.7.w1.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.7.w2.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.7.w3.scale: [128, 4] torch.float8_e8m0fnu
+  layers.2.ffn.experts.7.w1.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.7.w2.weight: [128, 64] torch.int8
+  layers.2.ffn.experts.7.w3.weight: [128, 64] torch.int8
+wrote /home/crichalchemist/colibri-radv/c/deepseek_v4_tiny_e8 (1252363 bytes, transformers=5.16.1)
+OK deepseek_v4 tier 4 experts (short): ids = CPU = reference, device 137 of 186 routed experts, evictions 0, packed_slots=0 rows16
+OK deepseek_v4 tier 8 experts, pinned rows16 (short): ids = CPU = reference, device 138 of 186 routed experts, evictions 0, packed_slots=2 rows16
+OK deepseek_v4 tier 4 experts (compressed): ids = CPU = reference, device 162 of 282 routed experts, evictions 0, packed_slots=0 rows16
+OK deepseek_v4 tier 8 experts, pinned rows16 (compressed): ids = CPU = reference, device 161 of 282 routed experts, evictions 0, packed_slots=2 rows16
+OK deepseek_v4 tier 4 experts (long): ids = CPU = reference, device 474 of 906 routed experts, evictions 0, packed_slots=0 rows16
+OK deepseek_v4 tier 8 experts, pinned rows16 (long): ids = CPU = reference, device 474 of 906 routed experts, evictions 0, packed_slots=2 rows16
+OK deepseek_v4 tier a budget of three experts (long): ids = CPU = reference, device 70 of 906 routed experts, evictions 5, packed_slots=6 rows16
+OK deepseek_v4 tier trunk on the device too (long): ids = CPU = reference, device 474 of 906 routed experts, evictions 0, packed_slots=0 rows16
+OK deepseek_v4 tier the GEMM route from 2 rows (long): ids = CPU = reference, device 474 of 906 routed experts, evictions 0, packed_slots=0 rows16
+OK deepseek_v4 tier warm start from the CPU run's history (long): ids = CPU = reference, device 906 of 906 routed experts, evictions 0, packed_slots=0 rows16
+   [VK] tier deepseek_v4 turn: device 432 of 432 routed experts (100.0%; this turn 432 of 432
+OK deepseek_v4 tier served: 53 of 71 positions' logprob echoes identical to the CPU's, worst |delta| 1.00e-06

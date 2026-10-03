@@ -1,0 +1,8 @@
+step5 dev build warnings=0
+step5 dev harness-full rc=1 last='FAIL' (67s)
+glm-on-dev exit=1 (60s) last='FAIL: glm53 decode, cold: no matmul ran on the device'
+step3 comb build warnings=0
+step3 layers harness rc=0 last='[Vulkan Loader] DEBUG | LAYER:  Unloading layer library /usr/lib/x86_64-linux-gnu/libVkLayer_khronos_validation.so' (11s)
+step3 layers tier rc=0 last='PASS' (2s)
+glm-on-comb-rerun exit=1 (70s) last='FAIL: glm53 decode, cold: no matmul ran on the device'
+CHAIN2 COMPLETE

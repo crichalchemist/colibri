@@ -1,0 +1,372 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -MMD -MP -DCOLI_VULKAN qwen36.c     backend_vulkan.o vk_tier.o -o qwen36 -lm -fopenmp -pthread -lvulkan
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -MMD -MP -DCOLI_VULKAN qwen38.c   backend_vulkan.o vk_tier.o -o qwen38 -lm -fopenmp -pthread -lvulkan
+geometry qwen36-35b: hidden=64, n_layers=8, q_heads=4, kv_heads=2, head_dim=16, rope_dim=8, n_experts=8, topk=2, inter=32, dn_key_heads=4, dn_value_heads=8, fused_experts=False, mtp=False
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 19.71it/s]
+Tiny model saved at qwen36_tiny  (params ~ 0.6M)
+full: both layer kinds active (Gated Attention + Gated DeltaNet)
+ref.json -> qwen36_tiny/ref_full.json
+  prompt_ids=[1, 2, 3, 4, 5]
+  full_ids =[1, 2, 3, 4, 5, 32, 146, 258, 130, 236, 174, 55, 104, 68, 141, 234, 74, 308, 166, 305, 301]
+geometry qwen3-coder-30b: hidden=64, n_layers=6, q_heads=8, kv_heads=1, head_dim=16, rope_dim=16, n_experts=16, topk=4, inter=32, fused_experts=False, mtp=False, plain_qwen3=True
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 68.87it/s]
+Tiny model saved at qwen3_coder_tiny  (params ~ 0.7M)
+full: both layer kinds active (Gated Attention + Gated DeltaNet)
+ref.json -> qwen3_coder_tiny/ref_full.json
+  prompt_ids=[1, 2, 3, 4, 5]
+  full_ids =[1, 2, 3, 4, 5, 42, 235, 261, 85, 85, 42, 126, 261, 252, 126, 66, 45, 73, 93, 252, 252]
+geometry qwen38-27b-dense: hidden=64, n_layers=8, q_heads=6, kv_heads=1, head_dim=16, rope_dim=8, n_experts=0, topk=0, inter=128, dn_key_heads=2, dn_value_heads=6, fused_experts=False, mtp=False, dense=True
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 188.25it/s]
+Tiny model saved at qwen38_27b_tiny  (params ~ 0.4M)
+full: both layer kinds active (Gated Attention + Gated DeltaNet)
+ref.json -> qwen38_27b_tiny/ref_full.json
+  prompt_ids=[1, 2, 3, 4, 5]
+  full_ids =[1, 2, 3, 4, 5, 256, 48, 59, 66, 48, 59, 48, 59, 126, 259, 319, 119, 59, 48, 307, 228]
+geometry qwen38-2p4t: hidden=32, n_layers=92, q_heads=16, kv_heads=1, head_dim=16, rope_dim=8, n_experts=512, topk=10, inter=16, dn_key_heads=2, dn_value_heads=16, fused_experts=True, mtp=True
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:05<00:00,  5.20s/it]Writing model shards: 100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+Tiny model saved at qwen38_2p4t_tiny  (params ~ 75.7M)
+full: both layer kinds active (Gated Attention + Gated DeltaNet)
+ref.json -> qwen38_2p4t_tiny/ref_full.json
+  prompt_ids=[1, 2, 3, 4, 5]
+  full_ids =[1, 2, 3, 4, 5, 115, 126, 179, 126, 236, 126, 25, 231, 231, 18, 236, 105, 316, 231, 179, 105]
+shard rewritten: fused_experts=True mtp=True (1609 tensors)
+config -> qwen36_tiny_c/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen36_tiny_c/generation_config.json
+tensor kinds: 314 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (32 tensors)
+[layer 1 -> active 1] model-00001.safetensors (32 tensors)
+[layer 2 -> active 2] model-00002.safetensors (32 tensors)
+[layer 3 -> active 3] model-00003.safetensors (29 tensors)
+[layer 4 -> active 4] model-00004.safetensors (32 tensors)
+[layer 5 -> active 5] model-00005.safetensors (32 tensors)
+[layer 6 -> active 6] model-00006.safetensors (32 tensors)
+[layer 7 -> active 7] model-00007.safetensors (29 tensors)
+[meta] qwen36_tiny_c/qwen36_meta.json
+
+Done. Container at: qwen36_tiny_c
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen36_tiny_c ./qwen36 16 8 ref_qwen36.json
+OK qwen36 qwen36_tiny f32 cap=1: Matching tokens: 16/16, tokens = CPU, 944 matmuls on the GPU (59 matrices resident, 0.8 MiB; placed int8 0, int4 0, f32 59)
+OK qwen36 qwen36_tiny f32 cap=8: Matching tokens: 16/16, tokens = CPU, 944 matmuls on the GPU (59 matrices resident, 0.8 MiB; placed int8 0, int4 0, f32 59)
+OK qwen36 qwen36_tiny int8: tokens = CPU, 944 matmuls on the GPU (59 matrices resident, 0.2 MiB; placed int8 59, int4 0, f32 0)
+config -> qwen3_coder_tiny_c/config.json (flat; model_type=qwen3_moe)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen3_coder_tiny_c/generation_config.json
+tensor kinds: 342 in 6 layers, 3 globals, prefix 'model.'
+layers: 6 total, 6 full_attention (Phase 2: all 6 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (41 tensors)
+[layer 1 -> active 1] model-00001.safetensors (41 tensors)
+[layer 2 -> active 2] model-00002.safetensors (41 tensors)
+[layer 3 -> active 3] model-00003.safetensors (41 tensors)
+[layer 4 -> active 4] model-00004.safetensors (41 tensors)
+[layer 5 -> active 5] model-00005.safetensors (41 tensors)
+[meta] qwen3_coder_tiny_c/qwen36_meta.json
+
+Done. Container at: qwen3_coder_tiny_c
+All 6 layers stored (0 Gated DeltaNet). n_active=6.
+Run (engine):  SNAP=qwen3_coder_tiny_c ./qwen36 16 8 ref_qwen36.json
+OK qwen36 qwen3_coder_tiny f32 cap=1: Matching tokens: 16/16, tokens = CPU, 496 matmuls on the GPU (31 matrices resident, 0.5 MiB; placed int8 0, int4 0, f32 31)
+OK qwen36 qwen3_coder_tiny f32 cap=8: Matching tokens: 16/16, tokens = CPU, 496 matmuls on the GPU (31 matrices resident, 0.5 MiB; placed int8 0, int4 0, f32 31)
+OK qwen36 qwen3_coder_tiny int8: tokens = CPU, 496 matmuls on the GPU (31 matrices resident, 0.1 MiB; placed int8 31, int4 0, f32 0)
+config -> qwen38_27b_tiny_c/config.json (flat; model_type=qwen3_5_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen38_27b_tiny_c/generation_config.json
+tensor kinds: 106 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (14 tensors)
+[layer 1 -> active 1] model-00001.safetensors (14 tensors)
+[layer 2 -> active 2] model-00002.safetensors (14 tensors)
+[layer 3 -> active 3] model-00003.safetensors (11 tensors)
+[layer 4 -> active 4] model-00004.safetensors (14 tensors)
+[layer 5 -> active 5] model-00005.safetensors (14 tensors)
+[layer 6 -> active 6] model-00006.safetensors (14 tensors)
+[layer 7 -> active 7] model-00007.safetensors (11 tensors)
+[meta] qwen38_27b_tiny_c/qwen36_meta.json
+
+Done. Container at: qwen38_27b_tiny_c
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen38_27b_tiny_c ./qwen36 16 8 ref_qwen36.json
+OK qwen36 qwen38_27b_tiny f32 cap=1: Matching tokens: 16/16, tokens = CPU, 816 matmuls on the GPU (51 matrices resident, 1.2 MiB; placed int8 0, int4 0, f32 51)
+OK qwen36 qwen38_27b_tiny f32 cap=8: Matching tokens: 16/16, tokens = CPU, 816 matmuls on the GPU (51 matrices resident, 1.2 MiB; placed int8 0, int4 0, f32 51)
+OK qwen36 qwen38_27b_tiny int8: tokens = CPU, 816 matmuls on the GPU (51 matrices resident, 0.3 MiB; placed int8 51, int4 0, f32 0)
+config -> qwen38_2p4t_tiny_c/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen38_2p4t_tiny_c/generation_config.json
+skipping 19 `mtp.*` tensor(s): multi-token-prediction head (mtp_num_hidden_layers); the engine predicts one token per step and never reads it, config mtp_num_hidden_layers=1
+tensor kinds: 1587 in 92 layers, 3 globals, prefix 'model.'
+layers: 92 total, 23 full_attention (Phase 2: all 92 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (1040 tensors)
+[layer 1 -> active 1] model-00001.safetensors (1040 tensors)
+[layer 2 -> active 2] model-00002.safetensors (1040 tensors)
+[layer 3 -> active 3] model-00003.safetensors (1037 tensors)
+[layer 4 -> active 4] model-00004.safetensors (1040 tensors)
+[layer 5 -> active 5] model-00005.safetensors (1040 tensors)
+[layer 6 -> active 6] model-00006.safetensors (1040 tensors)
+[layer 7 -> active 7] model-00007.safetensors (1037 tensors)
+[layer 8 -> active 8] model-00008.safetensors (1040 tensors)
+[layer 9 -> active 9] model-00009.safetensors (1040 tensors)
+[layer 10 -> active 10] model-00010.safetensors (1040 tensors)
+[layer 11 -> active 11] model-00011.safetensors (1037 tensors)
+[layer 12 -> active 12] model-00012.safetensors (1040 tensors)
+[layer 13 -> active 13] model-00013.safetensors (1040 tensors)
+[layer 14 -> active 14] model-00014.safetensors (1040 tensors)
+[layer 15 -> active 15] model-00015.safetensors (1037 tensors)
+[layer 16 -> active 16] model-00016.safetensors (1040 tensors)
+[layer 17 -> active 17] model-00017.safetensors (1040 tensors)
+[layer 18 -> active 18] model-00018.safetensors (1040 tensors)
+[layer 19 -> active 19] model-00019.safetensors (1037 tensors)
+[layer 20 -> active 20] model-00020.safetensors (1040 tensors)
+[layer 21 -> active 21] model-00021.safetensors (1040 tensors)
+[layer 22 -> active 22] model-00022.safetensors (1040 tensors)
+[layer 23 -> active 23] model-00023.safetensors (1037 tensors)
+[layer 24 -> active 24] model-00024.safetensors (1040 tensors)
+[layer 25 -> active 25] model-00025.safetensors (1040 tensors)
+[layer 26 -> active 26] model-00026.safetensors (1040 tensors)
+[layer 27 -> active 27] model-00027.safetensors (1037 tensors)
+[layer 28 -> active 28] model-00028.safetensors (1040 tensors)
+[layer 29 -> active 29] model-00029.safetensors (1040 tensors)
+[layer 30 -> active 30] model-00030.safetensors (1040 tensors)
+[layer 31 -> active 31] model-00031.safetensors (1037 tensors)
+[layer 32 -> active 32] model-00032.safetensors (1040 tensors)
+[layer 33 -> active 33] model-00033.safetensors (1040 tensors)
+[layer 34 -> active 34] model-00034.safetensors (1040 tensors)
+[layer 35 -> active 35] model-00035.safetensors (1037 tensors)
+[layer 36 -> active 36] model-00036.safetensors (1040 tensors)
+[layer 37 -> active 37] model-00037.safetensors (1040 tensors)
+[layer 38 -> active 38] model-00038.safetensors (1040 tensors)
+[layer 39 -> active 39] model-00039.safetensors (1037 tensors)
+[layer 40 -> active 40] model-00040.safetensors (1040 tensors)
+[layer 41 -> active 41] model-00041.safetensors (1040 tensors)
+[layer 42 -> active 42] model-00042.safetensors (1040 tensors)
+[layer 43 -> active 43] model-00043.safetensors (1037 tensors)
+[layer 44 -> active 44] model-00044.safetensors (1040 tensors)
+[layer 45 -> active 45] model-00045.safetensors (1040 tensors)
+[layer 46 -> active 46] model-00046.safetensors (1040 tensors)
+[layer 47 -> active 47] model-00047.safetensors (1037 tensors)
+[layer 48 -> active 48] model-00048.safetensors (1040 tensors)
+[layer 49 -> active 49] model-00049.safetensors (1040 tensors)
+[layer 50 -> active 50] model-00050.safetensors (1040 tensors)
+[layer 51 -> active 51] model-00051.safetensors (1037 tensors)
+[layer 52 -> active 52] model-00052.safetensors (1040 tensors)
+[layer 53 -> active 53] model-00053.safetensors (1040 tensors)
+[layer 54 -> active 54] model-00054.safetensors (1040 tensors)
+[layer 55 -> active 55] model-00055.safetensors (1037 tensors)
+[layer 56 -> active 56] model-00056.safetensors (1040 tensors)
+[layer 57 -> active 57] model-00057.safetensors (1040 tensors)
+[layer 58 -> active 58] model-00058.safetensors (1040 tensors)
+[layer 59 -> active 59] model-00059.safetensors (1037 tensors)
+[layer 60 -> active 60] model-00060.safetensors (1040 tensors)
+[layer 61 -> active 61] model-00061.safetensors (1040 tensors)
+[layer 62 -> active 62] model-00062.safetensors (1040 tensors)
+[layer 63 -> active 63] model-00063.safetensors (1037 tensors)
+[layer 64 -> active 64] model-00064.safetensors (1040 tensors)
+[layer 65 -> active 65] model-00065.safetensors (1040 tensors)
+[layer 66 -> active 66] model-00066.safetensors (1040 tensors)
+[layer 67 -> active 67] model-00067.safetensors (1037 tensors)
+[layer 68 -> active 68] model-00068.safetensors (1040 tensors)
+[layer 69 -> active 69] model-00069.safetensors (1040 tensors)
+[layer 70 -> active 70] model-00070.safetensors (1040 tensors)
+[layer 71 -> active 71] model-00071.safetensors (1037 tensors)
+[layer 72 -> active 72] model-00072.safetensors (1040 tensors)
+[layer 73 -> active 73] model-00073.safetensors (1040 tensors)
+[layer 74 -> active 74] model-00074.safetensors (1040 tensors)
+[layer 75 -> active 75] model-00075.safetensors (1037 tensors)
+[layer 76 -> active 76] model-00076.safetensors (1040 tensors)
+[layer 77 -> active 77] model-00077.safetensors (1040 tensors)
+[layer 78 -> active 78] model-00078.safetensors (1040 tensors)
+[layer 79 -> active 79] model-00079.safetensors (1037 tensors)
+[layer 80 -> active 80] model-00080.safetensors (1040 tensors)
+[layer 81 -> active 81] model-00081.safetensors (1040 tensors)
+[layer 82 -> active 82] model-00082.safetensors (1040 tensors)
+[layer 83 -> active 83] model-00083.safetensors (1037 tensors)
+[layer 84 -> active 84] model-00084.safetensors (1040 tensors)
+[layer 85 -> active 85] model-00085.safetensors (1040 tensors)
+[layer 86 -> active 86] model-00086.safetensors (1040 tensors)
+[layer 87 -> active 87] model-00087.safetensors (1037 tensors)
+[layer 88 -> active 88] model-00088.safetensors (1040 tensors)
+[layer 89 -> active 89] model-00089.safetensors (1040 tensors)
+[layer 90 -> active 90] model-00090.safetensors (1040 tensors)
+[layer 91 -> active 91] model-00091.safetensors (1037 tensors)
+[meta] qwen38_2p4t_tiny_c/qwen36_meta.json
+
+Done. Container at: qwen38_2p4t_tiny_c
+All 92 layers stored (69 Gated DeltaNet). n_active=92.
+Run (engine):  SNAP=qwen38_2p4t_tiny_c ./qwen36 16 8 ref_qwen36.json
+OK qwen36 qwen38_2p4t_tiny f32 cap=8: Matching tokens: 16/16, tokens = CPU, 10688 matmuls on the GPU (668 matrices resident, 12.1 MiB; placed int8 0, int4 0, f32 668)
+OK qwen36 qwen38_2p4t_tiny int8: tokens = CPU, 10688 matmuls on the GPU (668 matrices resident, 3.4 MiB; placed int8 668, int4 0, f32 0)
+geometry qwen36-35b: hidden=64, n_layers=8, q_heads=4, kv_heads=2, head_dim=16, rope_dim=8, n_experts=8, topk=2, inter=64, dn_key_heads=4, dn_value_heads=8, fused_experts=False, mtp=False
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 78.01it/s]
+Tiny model saved at qwen36_tiny64  (params ~ 1.1M)
+full: both layer kinds active (Gated Attention + Gated DeltaNet)
+ref.json -> qwen36_tiny64/ref_full.json
+  prompt_ids=[1, 2, 3, 4, 5]
+  full_ids =[1, 2, 3, 4, 5, 184, 90, 63, 36, 155, 247, 47, 242, 315, 280, 26, 152, 97, 83, 250, 97]
+config -> qwen36_tiny64_c/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen36_tiny64_c/generation_config.json
+tensor kinds: 314 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (32 tensors)
+[layer 1 -> active 1] model-00001.safetensors (32 tensors)
+[layer 2 -> active 2] model-00002.safetensors (32 tensors)
+[layer 3 -> active 3] model-00003.safetensors (29 tensors)
+[layer 4 -> active 4] model-00004.safetensors (32 tensors)
+[layer 5 -> active 5] model-00005.safetensors (32 tensors)
+[layer 6 -> active 6] model-00006.safetensors (32 tensors)
+[layer 7 -> active 7] model-00007.safetensors (29 tensors)
+[meta] qwen36_tiny64_c/qwen36_meta.json
+
+Done. Container at: qwen36_tiny64_c
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen36_tiny64_c ./qwen36 16 4 ref_qwen36.json
+config -> qwen36_tiny64_g8/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen36_tiny64_g8/generation_config.json
+tensor kinds: 314 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (32 tensors)
+[layer 1 -> active 1] model-00001.safetensors (32 tensors)
+[layer 2 -> active 2] model-00002.safetensors (32 tensors)
+[layer 3 -> active 3] model-00003.safetensors (29 tensors)
+[layer 4 -> active 4] model-00004.safetensors (32 tensors)
+[layer 5 -> active 5] model-00005.safetensors (32 tensors)
+[layer 6 -> active 6] model-00006.safetensors (32 tensors)
+[layer 7 -> active 7] model-00007.safetensors (29 tensors)
+[meta] qwen36_tiny64_g8/qwen36_meta.json
+
+Done. Container at: qwen36_tiny64_g8
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen36_tiny64_g8 ./qwen36 16 8 ref_qwen36.json
+config -> qwen36_tiny64_d8/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen36_tiny64_d8/generation_config.json
+tensor kinds: 314 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (32 tensors)
+[layer 1 -> active 1] model-00001.safetensors (32 tensors)
+[layer 2 -> active 2] model-00002.safetensors (32 tensors)
+[layer 3 -> active 3] model-00003.safetensors (29 tensors)
+[layer 4 -> active 4] model-00004.safetensors (32 tensors)
+[layer 5 -> active 5] model-00005.safetensors (32 tensors)
+[layer 6 -> active 6] model-00006.safetensors (32 tensors)
+[layer 7 -> active 7] model-00007.safetensors (29 tensors)
+[meta] qwen36_tiny64_d8/qwen36_meta.json
+
+Done. Container at: qwen36_tiny64_d8
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen36_tiny64_d8 ./qwen36 16 4 ref_qwen36.json
+config -> qwen36_tiny_i4r/config.json (flat; model_type=qwen3_5_moe_text)
+WARNING: tokenizer.json not found; the engine will need TOK=<path>
+generation_config.json -> qwen36_tiny_i4r/generation_config.json
+tensor kinds: 314 in 8 layers, 3 globals, prefix 'model.'
+layers: 8 total, 2 full_attention (Phase 2: all 8 stored)
+[globals] model-globals.safetensors (3 tensors)
+[layer 0 -> active 0] model-00000.safetensors (32 tensors)
+[layer 1 -> active 1] model-00001.safetensors (32 tensors)
+[layer 2 -> active 2] model-00002.safetensors (32 tensors)
+[layer 3 -> active 3] model-00003.safetensors (29 tensors)
+[layer 4 -> active 4] model-00004.safetensors (32 tensors)
+[layer 5 -> active 5] model-00005.safetensors (32 tensors)
+[layer 6 -> active 6] model-00006.safetensors (32 tensors)
+[layer 7 -> active 7] model-00007.safetensors (29 tensors)
+[meta] qwen36_tiny_i4r/qwen36_meta.json
+
+Done. Container at: qwen36_tiny_i4r
+All 8 layers stored (6 Gated DeltaNet). n_active=8.
+Run (engine):  SNAP=qwen36_tiny_i4r ./qwen36 16 4 ref_qwen36.json
+OK qwen36 tier int8 cap=1: tokens = CPU, device 220 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int4-g64 planar cap=1: tokens = CPU, device 218 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int4 per row cap=1: tokens = CPU, device 221 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int8 gs64 cap=1: tokens = CPU, device 218 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier mixed int4/int8 cap=1: tokens = CPU, device 219 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int8 cap=8: tokens = CPU, device 220 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int4-g64 planar cap=8: tokens = CPU, device 218 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int4 per row cap=8: tokens = CPU, device 221 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier int8 gs64 cap=8: tokens = CPU, device 218 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier mixed int4/int8 cap=8: tokens = CPU, device 219 of 320 routed experts, evictions 0, trunk on the device
+OK qwen36 tier alone (COLI_VK_DENSE=0): tokens = CPU, device 123 of 320 routed experts, evictions 0, trunk on the CPU
+OK qwen36 tier, a budget of two experts: tokens = CPU, device 15 of 320 routed experts, evictions 2, trunk on the device
+OK qwen36 COLI_VK_TIER=0: tokens = CPU, no tier, 944 matmuls on the GPU
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 166.63it/s]
+Reference written to qwen38_tiny/ref.json
+Tiny Qwen3.8 fixture written to qwen38_tiny
+prompt_ids=[1, 3, 4, 5, 6]
+full_ids=[1, 3, 4, 5, 6, 49, 3, 39, 56, 2, 35, 35, 29]
+OK qwen38 bf16 batch=0: Matching tokens: 8/8, tokens = CPU, 632 matmuls on the GPU (65 matrices resident, 0.1 MiB; placed int8 0, bf16 65, f32 0)
+OK qwen38 int8 batch=0: Matching tokens: 8/8, tokens = CPU, 632 matmuls on the GPU (65 matrices resident, 0.1 MiB; placed int8 57, bf16 8, f32 0)
+OK qwen38 f32 batch=0: Matching tokens: 8/8, tokens = CPU, 632 matmuls on the GPU (65 matrices resident, 0.2 MiB; placed int8 0, bf16 0, f32 65)
+OK qwen38 bf16 batch=1: Matching tokens: 8/8, tokens = CPU, 520 matmuls on the GPU (65 matrices resident, 0.1 MiB; placed int8 0, bf16 65, f32 0)
+OK qwen38 int8 batch=1: Matching tokens: 8/8, tokens = CPU, 520 matmuls on the GPU (65 matrices resident, 0.1 MiB; placed int8 57, bf16 8, f32 0)
+OK qwen38 f32 batch=1: Matching tokens: 8/8, tokens = CPU, 520 matmuls on the GPU (65 matrices resident, 0.2 MiB; placed int8 0, bf16 0, f32 65)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 156.97it/s]
+fp8 experts: 48 matrices rewritten as F8_E4M3 + BF16 weight_scale_inv
+Reference written to qwen38_tiny_fp8/ref.json
+Tiny Qwen3.8 fixture written to qwen38_tiny_fp8
+prompt_ids=[1, 3, 4, 5, 6]
+full_ids=[1, 3, 4, 5, 6, 49, 3, 39, 56, 2, 35, 35, 29]
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 157.77it/s]
+fp8 experts: 48 matrices rewritten as F8_E4M3 + BF16 weight_scale_inv
+Reference written to qwen38_tiny_int4/ref.json
+qwen38_tiny_int4: 4 layers x 4 experts, hidden 32, moe_intermediate 8, prefix model
+  per expert: FP8 768 bytes -> int4-g64 576 bytes (75.0%)
+  sidecar qwen38_tiny_int4/experts-int4g64: 25,600 bytes (0.00 GiB) for 12,288 bytes of FP8 experts
+  layer   0: 4 experts in    0.1s  rel L2 gate 0.1025 up 0.0990 down 0.0711 (max 0.1093)  peak RSS 387 MB
+  layer   1: 4 experts in    0.1s  rel L2 gate 0.1016 up 0.1002 down 0.0757 (max 0.1120)  peak RSS 387 MB
+  layer   2: 4 experts in    0.1s  rel L2 gate 0.1030 up 0.0948 down 0.0727 (max 0.1112)  peak RSS 387 MB
+  layer   3: 4 experts in    0.1s  rel L2 gate 0.1029 up 0.0984 down 0.0762 (max 0.1088)  peak RSS 387 MB
+qwen38_tiny_int4/experts-int4g64: complete, worst expert matrix rel L2 0.1120
+int4 experts: qwen38_tiny_int4/experts-int4g64 written, the model now holds its dequantized values
+int4 reference written to qwen38_tiny_int4/ref_int4.json
+Tiny Qwen3.8 fixture written to qwen38_tiny_int4
+prompt_ids=[1, 3, 4, 5, 6]
+full_ids=[1, 3, 4, 5, 6, 49, 3, 39, 56, 2, 35, 35, 29]
+OK qwen38 tier qwen38_tiny batch=0 cap=1: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny batch=0 cap=4: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny batch=1 cap=1: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny batch=1 cap=4: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_fp8 batch=0 cap=1: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_fp8 batch=0 cap=4: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_fp8 batch=1 cap=1: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_fp8 batch=1 cap=4: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_int4 batch=0 cap=1: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_int4 batch=0 cap=4: tokens = CPU, device 80 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_int4 batch=1 cap=1: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier qwen38_tiny_int4 batch=1 cap=4: tokens = CPU, device 56 of 96 routed experts, evictions 0, trunk on the device
+OK qwen38 tier alone (COLI_VK_DENSE=0): tokens = CPU, device 37 of 96 routed experts, evictions 0, trunk on the CPU
+OK qwen38 tier, a budget of two experts: tokens = CPU, device 19 of 96 routed experts, evictions 1, trunk on the device
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 160.08it/s]
+mtp head: 53 tensors (decoder layer shaped like model.layers.3.*)
+fp8 experts: 48 matrices rewritten as F8_E4M3 + BF16 weight_scale_inv
+Reference written to qwen38_tiny_fp8_mtp/ref.json
+Tiny Qwen3.8 fixture written to qwen38_tiny_fp8_mtp
+prompt_ids=[1, 3, 4, 5, 6]
+full_ids=[1, 3, 4, 5, 6, 49, 3, 39, 56, 2, 35, 35, 29]
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 166.80it/s]
+mtp head: 53 tensors (decoder layer shaped like model.layers.3.*)
+fp8 experts: 48 matrices rewritten as F8_E4M3 + BF16 weight_scale_inv
+Reference written to qwen38_tiny_int4_mtp/ref.json
+qwen38_tiny_int4_mtp: 4 layers x 4 experts, hidden 32, moe_intermediate 8, prefix model
+  per expert: FP8 768 bytes -> int4-g64 576 bytes (75.0%)
+  sidecar qwen38_tiny_int4_mtp/experts-int4g64: 25,600 bytes (0.00 GiB) for 12,288 bytes of FP8 experts
+  layer   0: 4 experts in    0.1s  rel L2 gate 0.1025 up 0.0990 down 0.0711 (max 0.1093)  peak RSS 387 MB
+  layer   1: 4 experts in    0.1s  rel L2 gate 0.1016 up 0.1002 down 0.0757 (max 0.1120)  peak RSS 387 MB
+  layer   2: 4 experts in    0.1s  rel L2 gate 0.1030 up 0.0948 down 0.0727 (max 0.1112)  peak RSS 387 MB
+  layer   3: 4 experts in    0.1s  rel L2 gate 0.1029 up 0.0984 down 0.0762 (max 0.1088)  peak RSS 387 MB
+qwen38_tiny_int4_mtp/experts-int4g64: complete, worst expert matrix rel L2 0.1120
+int4 experts: qwen38_tiny_int4_mtp/experts-int4g64 written, the model now holds its dequantized values
+int4 reference written to qwen38_tiny_int4_mtp/ref_int4.json
+Tiny Qwen3.8 fixture written to qwen38_tiny_int4_mtp
+prompt_ids=[1, 3, 4, 5, 6]
+full_ids=[1, 3, 4, 5, 6, 49, 3, 39, 56, 2, 35, 35, 29]
+OK qwen38 tier MTP qwen38_tiny_fp8_mtp batch=0: tokens = CPU, device 112 of 128 routed experts, evictions 0, trunk on the device
+OK qwen38 tier MTP qwen38_tiny_fp8_mtp batch=1: tokens = CPU, device 88 of 128 routed experts, evictions 0, trunk on the device
+OK qwen38 tier MTP qwen38_tiny_int4_mtp batch=0: tokens = CPU, device 112 of 128 routed experts, evictions 0, trunk on the device
+OK qwen38 tier MTP qwen38_tiny_int4_mtp batch=1: tokens = CPU, device 88 of 128 routed experts, evictions 0, trunk on the device

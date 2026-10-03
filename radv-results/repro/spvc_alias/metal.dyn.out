@@ -1,0 +1,10 @@
+gemm.dyn.metal:643:184: error: use of undeclared identifier '_1129'
+        fetch_step(param, param_1, param_2, param_3, p, (*spvDescriptorSet0.m_241), (*spvDescriptorSet0.m_260), (*spvDescriptorSet0.m_318), (*spvDescriptorSet0.m_364), rwa, rwb, rws, _1129, _1139, rx);
+                                                                                                                                                                                       ^
+gemm.dyn.metal:658:190: error: use of undeclared identifier '_1129'
+            fetch_step(param_4, param_5, param_6, param_7, p, (*spvDescriptorSet0.m_241), (*spvDescriptorSet0.m_260), (*spvDescriptorSet0.m_318), (*spvDescriptorSet0.m_364), rwa, rwb, rws, _1129, _1139, rx);
+                                                                                                                                                                                             ^
+gemm.dyn.metal:701:194: error: use of undeclared identifier '_1129'
+            fetch_step(param_13, param_14, param_15, param_16, p, (*spvDescriptorSet0.m_241), (*spvDescriptorSet0.m_260), (*spvDescriptorSet0.m_318), (*spvDescriptorSet0.m_364), rwa, rwb, rws, _1129, _1139, rx);
+                                                                                                                                                                                                 ^
+3 errors generated.

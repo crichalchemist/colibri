@@ -1,0 +1,22 @@
+#version 450
+// dynoff with GAP static bindings between the two dynamic ones, as in the expert
+// batch's gate+up set (x dynamic at 0, four weight/scale buffers static at 1..4, h dynamic at 5).
+layout(local_size_x = 64) in;
+layout(std430, set = 0, binding = 0) readonly buffer IN { float a[]; } src;
+layout(std430, set = 0, binding = 1) readonly buffer S1 { float s[]; } s1;
+#if GAP > 1
+layout(std430, set = 0, binding = 2) readonly buffer S2 { float s[]; } s2;
+layout(std430, set = 0, binding = 3) readonly buffer S3 { float s[]; } s3;
+layout(std430, set = 0, binding = 4) readonly buffer S4 { float s[]; } s4;
+#endif
+layout(std430, set = 0, binding = GAP + 1) writeonly buffer OUT { float b[]; } dst;
+layout(push_constant) uniform PC { int n, stage, tag; } pc;
+void main() {
+    uint i = gl_GlobalInvocationID.x;
+    if (i >= uint(pc.n)) return;
+    float m = s1.s[i];
+#if GAP > 1
+    m *= s2.s[i] * s3.s[i] * s4.s[i];
+#endif
+    dst.b[i] = pc.stage == 0 ? 2.0 * m * src.a[i] + float(pc.tag) : m * src.a[i] + 1.0;
+}

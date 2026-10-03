@@ -1,0 +1,4 @@
+venv ready: diffusers 0.40.0 torch 2.14.0+cpu
+gpu free; rerunning mimo-qwenimage on comb with PY=/home/crichalchemist/venv-colibri/bin/python
+mimo-qwenimage rerun exit=1 (143s) last='ImportError: cannot import name 'AutoencoderKLQwenImage21' from 'diffusers' (/home/crichalchemist/venv-colibri/lib/python3.14/site-packages/diffusers/__init__.py). Did you mean: 'AutoencoderKLQwenImage'?'
+CHAIN3 COMPLETE

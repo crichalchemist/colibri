@@ -1,0 +1,4 @@
+=== own=0 dyn_first=0 === mvk_shared_module: module=shared order=static-first W=256 -> PASS
+=== own=0 dyn_first=1 === mvk_shared_module: module=shared order=dynamic-first W=256 -> PASS
+=== own=1 dyn_first=0 === mvk_shared_module: module=own order=static-first W=256 -> PASS
+=== own=1 dyn_first=1 === mvk_shared_module: module=own order=dynamic-first W=256 -> PASS

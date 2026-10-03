@@ -1,0 +1,66 @@
+### vary=0 sgprobe
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size off
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+gl_SubgroupInvocationID 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ... (64 distinct) max=63
+gl_SubgroupID          0 1 2 3  (4 distinct) max=3
+gl_NumSubgroups        4  (1 distinct) max=4
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0
+### vary=0 sgshuffle
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size off
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0
+### vary=1 sgprobe
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size on
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+gl_SubgroupInvocationID 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ... (64 distinct) max=63
+gl_SubgroupID          0 1 2 3  (4 distinct) max=3
+gl_NumSubgroups        4  (1 distinct) max=4
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0
+### vary=1 sgshuffle
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size on
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0
+### vary=2 sgprobe
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size on + require full subgroups
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+gl_SubgroupInvocationID 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 ... (64 distinct) max=63
+gl_SubgroupID          0 1 2 3  (4 distinct) max=3
+gl_NumSubgroups        4  (1 distinct) max=4
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0
+### vary=2 sgshuffle
+device AMD Radeon Pro 580X (RADV POLARIS10) | driver radv Mesa 26.0.8-1ubuntu0.3 | subgroupSize 64 | ops 0x6ff | stages 0x3f
+sgprobe: allow varying subgroup size on + require full subgroups
+queue family 0 used
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+rc=0

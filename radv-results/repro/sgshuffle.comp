@@ -1,0 +1,22 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_arithmetic : require
+#extension GL_KHR_shader_subgroup_shuffle : require
+#extension GL_KHR_shader_subgroup_ballot : require
+// One workgroup of 256: do shuffles reach across 64 lanes? Same 5-field layout
+// as sgprobe.comp; sgshuffle.c is sgprobe.c reading this file.
+layout(local_size_x = 256) in;
+layout(std430, set = 0, binding = 0) writeonly buffer OUT { uint v[]; } o;
+uint butterfly(uint top) {             // sum of 1 over masks 1, 2, ..., top
+    uint s = 1u;
+    for (uint m = 1u; m <= top; m <<= 1) s += subgroupShuffleXor(s, m);
+    return s;
+}
+void main() {
+    uint i = gl_LocalInvocationID.x, lane = gl_SubgroupInvocationID;
+    o.v[i * 5u + 0u] = gl_SubgroupSize;
+    o.v[i * 5u + 1u] = subgroupShuffleXor(lane, 32u) == (lane ^ 32u) ? 1u : 0u;  // 1 = right partner
+    o.v[i * 5u + 2u] = butterfly(16u);                                            // 32 if right
+    o.v[i * 5u + 3u] = butterfly(32u);                                            // 64 if right
+    o.v[i * 5u + 4u] = subgroupAdd(1u);
+}

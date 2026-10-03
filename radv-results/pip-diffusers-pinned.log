@@ -1,0 +1,57 @@
+Collecting git+https://github.com/huggingface/diffusers@80c7ed262aeffbeb43ef13ae04baeb9b84515a69
+  Cloning https://github.com/huggingface/diffusers (to revision 80c7ed262aeffbeb43ef13ae04baeb9b84515a69) to /tmp/pip-req-build-nrr1vgjr
+  Running command git clone --filter=blob:none --quiet https://github.com/huggingface/diffusers /tmp/pip-req-build-nrr1vgjr
+  Running command git rev-parse -q --verify '80c7ed262aeffbeb43ef13ae04baeb9b84515a69^{commit}'
+  80c7ed262aeffbeb43ef13ae04baeb9b84515a69
+  Running command git checkout -q 80c7ed262aeffbeb43ef13ae04baeb9b84515a69
+  Resolved https://github.com/huggingface/diffusers to commit 80c7ed262aeffbeb43ef13ae04baeb9b84515a69
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Requirement already satisfied: importlib_metadata in /home/crichalchemist/venv-colibri/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (9.0.1)
+Requirement already satisfied: filelock in /home/crichalchemist/.local/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (3.32.5)
+Collecting huggingface-hub<2.0,>=1.31.0 (from diffusers==0.41.0.dev0)
+  Downloading huggingface_hub-1.33.0-py3-none-any.whl.metadata (16 kB)
+Requirement already satisfied: numpy in /home/linuxbrew/.linuxbrew/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (2.5.3)
+Requirement already satisfied: regex!=2019.12.17 in /home/crichalchemist/.local/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (2026.9.3)
+Requirement already satisfied: requests in /home/crichalchemist/venv-colibri/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (2.34.2)
+Requirement already satisfied: safetensors>=0.8.0 in /home/crichalchemist/.local/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (0.8.0)
+Requirement already satisfied: Pillow in /home/linuxbrew/.linuxbrew/lib/python3.14/site-packages (from diffusers==0.41.0.dev0) (12.3.0)
+Requirement already satisfied: click<9.0.0,>=8.4.2 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (8.5.0)
+Requirement already satisfied: fsspec>=2023.5.0 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (2026.7.0)
+Requirement already satisfied: hf-xet<2.0.0,>=1.6.0 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (1.6.0)
+Requirement already satisfied: httpx<1,>=0.23.0 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (0.28.1)
+Requirement already satisfied: packaging>=20.9 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (26.3)
+Requirement already satisfied: pyyaml>=5.1 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (6.0.3)
+Requirement already satisfied: tqdm>=4.42.1 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (4.70.0)
+Requirement already satisfied: typing-extensions>=4.1.0 in /home/crichalchemist/.local/lib/python3.14/site-packages (from huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (4.16.0)
+Requirement already satisfied: anyio in /home/crichalchemist/.local/lib/python3.14/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (4.15.0)
+Requirement already satisfied: certifi in /home/linuxbrew/.linuxbrew/lib/python3.14/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (2026.7.22)
+Requirement already satisfied: httpcore==1.* in /home/crichalchemist/.local/lib/python3.14/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (1.0.9)
+Requirement already satisfied: idna in /home/crichalchemist/.local/lib/python3.14/site-packages (from httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (3.19)
+Requirement already satisfied: h11>=0.16 in /home/crichalchemist/.local/lib/python3.14/site-packages (from httpcore==1.*->httpx<1,>=0.23.0->huggingface-hub<2.0,>=1.31.0->diffusers==0.41.0.dev0) (0.16.0)
+Requirement already satisfied: zipp>=3.20 in /home/crichalchemist/venv-colibri/lib/python3.14/site-packages (from importlib_metadata->diffusers==0.41.0.dev0) (4.1.0)
+Requirement already satisfied: charset_normalizer<4,>=2 in /home/crichalchemist/venv-colibri/lib/python3.14/site-packages (from requests->diffusers==0.41.0.dev0) (3.5.2)
+Requirement already satisfied: urllib3<3,>=1.26 in /home/crichalchemist/venv-colibri/lib/python3.14/site-packages (from requests->diffusers==0.41.0.dev0) (2.8.0)
+Downloading huggingface_hub-1.33.0-py3-none-any.whl (846 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.4/846.4 kB 5.4 MB/s  0:00:00
+Building wheels for collected packages: diffusers
+  Building wheel for diffusers (pyproject.toml): started
+  Building wheel for diffusers (pyproject.toml): finished with status 'done'
+  Created wheel for diffusers: filename=diffusers-0.41.0.dev0-py3-none-any.whl size=6013308 sha256=619ddcdfc71550d9fb4271820d129bd8bedb2ab06a51a03701c43796002a2db9
+  Stored in directory: /home/crichalchemist/.cache/pip/wheels/e0/45/ef/e2a8130f869bbc58b2440586a6d07b8267acd1bc39098b5836
+Successfully built diffusers
+Installing collected packages: huggingface-hub, diffusers
+  Attempting uninstall: huggingface-hub
+    Found existing installation: huggingface_hub 1.30.0
+    Not uninstalling huggingface-hub at /home/crichalchemist/.local/lib/python3.14/site-packages, outside environment /home/crichalchemist/venv-colibri
+    Can't uninstall 'huggingface_hub'. No files were found to uninstall.
+  Attempting uninstall: diffusers
+    Found existing installation: diffusers 0.40.0
+    Uninstalling diffusers-0.40.0:
+      Successfully uninstalled diffusers-0.40.0
+
+Successfully installed diffusers-0.41.0.dev0 huggingface-hub-1.33.0

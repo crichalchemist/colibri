@@ -1,0 +1,44 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN colibri.c   backend_vulkan.o vk_tier.o  -o colibri -lm -fopenmp -pthread  -lvulkan
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN glm53.c  backend_vulkan.o vk_tier.o -o glm53 -lm -fopenmp -pthread  -lvulkan
+[iq3] native encoder not built - using the numpy path (~15x slower). Build it with:  make iq3
+OK colibri f32 experts cap=1: tokens = CPU, device 68 of 124 routed experts + 68 vk, evictions 0, (fmt 10, down fmt 10)
+OK colibri f32 experts cap=64: tokens = CPU, device 47 of 124 routed experts + 47 vk, evictions 0, (fmt 10, down fmt 10)
+OK colibri f32 experts, prefill from a warm start: tokens = CPU, device 128 of 128 routed experts, evictions 0, (fmt 10, down fmt 10)
+OK colibri 8-bit experts cap=2: tokens = CPU, device 66 of 124 routed experts + 66 vk, evictions 0, (fmt 1, down fmt 1)
+OK colibri 8-bit experts, prefill warm: tokens = CPU, device 122 of 128 routed experts, evictions 0, (fmt 1, down fmt 1)
+OK colibri 4-bit experts cap=2: tokens = CPU, device 67 of 124 routed experts + 67 vk, evictions 0, (fmt 2, down fmt 2)
+OK colibri 4-bit experts, prefill warm: tokens = CPU, device 119 of 128 routed experts, evictions 0, (fmt 2, down fmt 2)
+OK colibri 3-bit experts cap=2: tokens = CPU, device 63 of 124 routed experts + 63 vk, evictions 0, (fmt 5, down fmt 5)
+OK colibri 3-bit experts, prefill warm: tokens = CPU, device 128 of 128 routed experts, evictions 0, (fmt 5, down fmt 5)
+OK colibri int4-g64 container: tokens = CPU, device 124 of 124 routed experts + 89 vk, evictions 0, (fmt 4 gs 64, down fmt 4 gs 64)
+OK colibri int4-g64 container, prefill: tokens = CPU, device 128 of 128 routed experts, evictions 0, (fmt 4 gs 64, down fmt 4 gs 64)
+OK colibri i4 container cap=1: tokens = CPU, device 124 of 124 routed experts + 86 vk, evictions 0, (fmt 4 gs 64, down fmt 2)
+OK colibri i4 container, prefill: tokens = CPU, device 115 of 128 routed experts, evictions 0, (fmt 4 gs 64, down fmt 2)
+OK colibri i4r container cap=1: tokens = CPU, device 124 of 124 routed experts + 82 vk, evictions 0, (fmt 2, down fmt 2)
+OK colibri i4r container, prefill: tokens = CPU, device 128 of 128 routed experts, evictions 0, (fmt 2, down fmt 2)
+OK colibri i3 container cap=1: tokens = CPU, device 124 of 124 routed experts + 85 vk, evictions 0, (fmt 5, down fmt 5)
+OK colibri i3 container, prefill: tokens = CPU, device 99 of 128 routed experts, evictions 0, (fmt 5, down fmt 5)
+OK colibri d3 container cap=1: tokens = CPU, device 124 of 124 routed experts + 86 vk, evictions 0, (fmt 4 gs 64, down fmt 5)
+OK colibri d3 container, prefill: tokens = CPU, device 122 of 128 routed experts, evictions 0, (fmt 4 gs 64, down fmt 5)
+OK colibri PIPE=1: tokens = CPU, device 67 of 124 routed experts + 67 vk, evictions 0, (fmt 4 gs 64, down fmt 2)
+OK colibri PILOT=1: tokens = CPU, device 57 of 124 routed experts + 57 vk, evictions 0, (fmt 4 gs 64, down fmt 2)
+OK colibri tier + COLI_VK_DENSE=1 COLI_VK_ATTN=1: tokens = CPU, device 124 of 124 routed experts + 86 vk, evictions 0, (fmt 4 gs 64, down fmt 2)
+OK colibri, a budget of two experts: tokens = CPU, device 18 of 124 routed experts + 18 vk, evictions 1, (fmt 10, down fmt 10)
+OK colibri, COLI_VK_EXPERTS=2: tokens = CPU, device 18 of 124 routed experts + 18 vk, evictions 1, (fmt 10, down fmt 10)
+OK colibri tier + COLI_VK_DEV2: tokens = CPU, device 76 of 124 routed experts + 82 vk, evictions 0, (fmt 2, down fmt 2)
+OK colibri COLI_VK_DEV2 alone (COLI_VK_TIER=0): tokens = CPU,  + 82 vk, , 
+OK colibri E8/IQ3 (fmt 6): the tier declines, tokens = CPU
+OK colibri COLI_VK_TIER=0: tokens = CPU, no tier
+[VK] VRAM pressure-proofing: memory_priority on, memory_budget on
+[VK] warning: only 256 of 7936 MB VRAM is host-visible (Resizable BAR appears disabled) — allocations beyond the 256 MB window fall back to system RAM and will be slow. Enable Resizable BAR / Smart Access Memory in the BIOS.
+[VK] ready: AMD Radeon Pro 580X (RADV POLARIS10), compute qfam 0, memtype 3, fused gate+up, absorb attention, tiled GEMM from S=2 and S*O>=4096
+[VK] glm53: device ready, dense matrices on the device (default)
+Vulkan: active for resident matrices
+[VK] tier glm53: on, AMD Radeon Pro 580X (RADV POLARIS10), budget 6.19 GiB = 16 experts of 27.0 KiB (fmt 4 gs 64, down fmt 4 gs 64), device memory, own queue, up to 16 promotions per token, balanced against the CPU, uploads awaited (COLI_VK_TIER_SYNC)
+[VK] tier glm53 run: device 16 of 32 routed experts (50.0%; this run 16 of 32) | CPU RAM hits 0, disk loads 4 | resident 4 (budget 16, 108.0 KiB of 6.19 GiB, 1 blocks, frag 0.00) | uploads 4 (96.0 KiB, 0 warm), evictions 0, skipped 0 queue + 0 rate, failed 0 | device 0.3 ms, CPU share 0.0 ms, waited 2.0 ms (0% of device time hidden) | balance: device share 0.51, 0 rows handed to the CPU
+[VK] glm53: 0 matmuls on the GPU
+teacher_forcing 6 8 10 12 14 18 20 24
+greedy 24 25 26 27 28 29 30 31
+decode 8 token in 0.0s = 352.066 tok/s (0.0 s/token)
+experts hits 0 miss 4 bytes 110592
+FAIL: glm53 decode, cold: no matmul ran on the device

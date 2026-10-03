@@ -1,0 +1,113 @@
+make: 'mimo' is up to date.
+make: 'qwenimage' is up to date.
+mimo_tiny: 613 tensors, 4.59 MB in 2 shards, 6 layers (pattern [0, 1, 1, 0, 1, 1]), 16 experts top-4, seed 20260930
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+OK mimo MIMO_DENSE_BITS=0: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo MIMO_DENSE_BITS=8: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo MIMO_DENSE_BITS=32: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo, a budget of two experts: tokens = CPU, device 9 of 1540 routed experts, evictions 2
+Writing model shards:   0%|          | 0/3 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 3/3 [00:00<00:00, 490.31it/s]
+There are modules in QwenImage21Transformer2DModel that should be kept in float32: []. Casting directly with `to()` can lead to inconsistent results; set `torch_dtype` in `from_pretrained()` instead to keep these modules in float32.
+Loading weights:   0%|          | 0/52 [00:00<?, ?it/s]Loading weights: 100%|██████████| 52/52 [00:00<00:00, 6124.79it/s]
+[08:23:32] text encoder loaded (torch.float32) in 0.2 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] encoded 94 tokens (drop 45) in 0.00 s: 'a red fox sitting in the snow, photograph'  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] text encoder freed  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 788.11it/s]
+[08:23:32] transformer loaded (torch.float32) in 0.1 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] step 0 transformer 0.00 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] step 1 transformer 0.00 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] step 2 transformer 0.00 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] denoised 64x96, 3 steps in 0.0 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:32] transformer freed  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+[08:23:33] VAE loaded in 0.0 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+[08:23:33] decoded 64x96 in 0.0 s  (anon 0.3 GB, file 0.1 GB, avail 54.7 GB, load 2.7)
+/home/crichalchemist/venv-colibri/lib/python3.14/site-packages/diffusers/utils/deprecation_utils.py:23: FutureWarning: `torch_dtype` is deprecated and will be removed in version 1.0.0. Please use `dtype` instead.
+  deprecate("torch_dtype", "1.0.0", _TORCH_DTYPE_DEPRECATION_MESSAGE)
+Cannot initialize model with low cpu memory usage because `accelerate` was not found in the environment. Defaulting to `low_cpu_mem_usage=False`. It is strongly recommended to install `accelerate` for faster and less memory-intense model loading. You can do so with: 
+```
+pip install accelerate
+```
+.
+Loading pipeline components...:   0%|          | 0/5 [00:00<?, ?it/s]
+Loading weights:   0%|          | 0/52 [00:00<?, ?it/s][ALoading weights: 100%|██████████| 52/52 [00:00<00:00, 6883.72it/s]
+
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00, 853.80it/s]
+Loading pipeline components...: 100%|██████████| 5/5 [00:00<00:00, 65.20it/s]
+wrote qwenimage_tiny: 94 ids (drop 45), 24 image tokens, 3 steps, vae raw std 0.532, 7.3% clamped, pipeline cross-check ok (latents diff 0.00e+00), 3.8 s
+OK qwenimage oracle: 12 stages of the Lavapipe run match the CPU run at 8 bits
+OK qwenimage oracle: 12 stages of the Lavapipe run match the CPU run at 16 bits
+OK qwenimage oracle: 12 stages of the Lavapipe run match the CPU run at 32 bits
+[qwenimage] text encoder: 2 layers, 0.00 GB resident (int8), 0.0 s
+[qwenimage] transformer: 2 blocks, 0.00 GB resident, 0.0 s
+[qwenimage] step 1/2  t=1000.0  0.00 s
+[qwenimage] step 2/2  t=20.0  0.00 s
+[qwenimage] qi-cpu.png  256x256  2 steps  seed 1  encode 0.0 s  denoise 0.0 s  decode 0.1 s
+OK qwenimage picture: 6 of 262144 bytes differ from the CPU's, max 1
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 1.004s
+
+OK

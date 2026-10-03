@@ -1,0 +1,93 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN mimo.c backend_vulkan.o vk_tier.o -o mimo -lm -fopenmp -pthread  -lvulkan
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN qwenimage.c backend_vulkan.o vk_tier.o -o qwenimage -lm -fopenmp -pthread  -lvulkan
+In file included from qwenimage.c:48:
+qwenimage_vae.h: In function ‘qiv_load_conv’:
+qwenimage_vae.h:171:5: warning: missing initializer for field ‘ld’ of ‘QiMat’ [-Wmissing-field-initializers]
+  171 |     c->m = (QiMat){ QI_F32, cout, cin * k * k, w, NULL };
+      |     ^
+In file included from qwenimage.c:44:
+qi_gemm.h:41:9: note: ‘ld’ declared here
+   41 |     int ld;             /* row stride in elements, 0 = K. Lets attention read one head's
+      |         ^~
+qwenimage_vae.h: In function ‘qiv_attention’:
+qwenimage_vae.h:508:5: warning: missing initializer for field ‘ld’ of ‘QiMat’ [-Wmissing-field-initializers]
+  508 |     const QiMat Km = { QI_F32, N, C, k, NULL }, Vm = { QI_F32, C, N, vt, NULL };
+      |     ^~~~~
+qi_gemm.h:41:9: note: ‘ld’ declared here
+   41 |     int ld;             /* row stride in elements, 0 = K. Lets attention read one head's
+      |         ^~
+qwenimage_vae.h:508:5: warning: missing initializer for field ‘ld’ of ‘QiMat’ [-Wmissing-field-initializers]
+  508 |     const QiMat Km = { QI_F32, N, C, k, NULL }, Vm = { QI_F32, C, N, vt, NULL };
+      |     ^~~~~
+qi_gemm.h:41:9: note: ‘ld’ declared here
+   41 |     int ld;             /* row stride in elements, 0 = K. Lets attention read one head's
+      |         ^~
+mimo_tiny: 613 tensors, 4.59 MB in 2 shards, 6 layers (pattern [0, 1, 1, 0, 1, 1]), 16 experts top-4, seed 20260930
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+ok greedy short: 12/12 tokens
+ok greedy window: 6/6 tokens
+ok greedy long: 6/6 tokens
+ok native dense, cache 4, prefill blocks of 3: identical in 3 cases
+ok prefill one token at a time: identical in 3 cases
+ok buffered expert reads: identical in 3 cases
+ok determinism: two identical runs, identical tokens
+skip block invariance: COLI_VULKAN=1 (GEMM for blocks, GEMV for one row)
+ok teacher forcing short: 20/20 positions
+ok teacher forcing window: 46/46 positions
+ok teacher forcing long: 78/78 positions
+ok oracle bites: corrupted expert scales diverge in 3/3 cases
+ok qkv scale grid bites: 3/3 cases
+ok image greedy (f32): 8/8 tokens
+ok image greedy (native BF16 tower): 8/8 tokens
+ok image teacher forcing: 40/40 positions
+ok image bites: the negated picture gives the reference's other answer
+mimo-tiny-check: all checks passed
+OK mimo MIMO_DENSE_BITS=0: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo MIMO_DENSE_BITS=8: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo MIMO_DENSE_BITS=32: the CPU's tokens, text and image, experts on the CPU and on the tier, trunk on the device and on the CPU
+OK mimo, a budget of two experts: tokens = CPU, device 9 of 1540 routed experts, evictions 2
+Traceback (most recent call last):
+  File "/home/crichalchemist/colibri-radv/c/tools/make_qwenimage_tiny.py", line 447, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/home/crichalchemist/colibri-radv/c/tools/make_qwenimage_tiny.py", line 392, in main
+    build_models(out, gen)
+    ~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/crichalchemist/colibri-radv/c/tools/make_qwenimage_tiny.py", line 289, in build_models
+    from diffusers import AutoencoderKLQwenImage21, FlowMatchEulerDiscreteScheduler, QwenImage21Transformer2DModel
+ImportError: cannot import name 'AutoencoderKLQwenImage21' from 'diffusers' (/home/crichalchemist/venv-colibri/lib/python3.14/site-packages/diffusers/__init__.py). Did you mean: 'AutoencoderKLQwenImage'?

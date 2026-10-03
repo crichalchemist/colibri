@@ -1,0 +1,44 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN kimi_k3.c  backend_vulkan.o vk_tier.o  -o kimi_k3 -lm -fopenmp -pthread  -lvulkan
+kimi_k3_tiny: 331 tensors, 1.7 MB, 6 layers (4 sparse, KDA at [1, 3]) x 8 experts, latent 32, seed 20260823
+ok greedy short: 8/8 tokens
+ok greedy chunk: 4/4 tokens
+ok greedy long: 4/4 tokens
+ok determinism: two identical runs, identical tokens
+ok teacher forcing short: 16/16 positions
+ok teacher forcing chunk: 44/44 positions
+ok teacher forcing long: 76/76 positions
+ok oracle bites: corrupted expert scales diverge in 2/3 cases
+kimi-k3-tiny-check: all checks passed
+ok greedy short: 8/8 tokens
+ok greedy chunk: 4/4 tokens
+ok greedy long: 4/4 tokens
+ok determinism: two identical runs, identical tokens
+ok teacher forcing short: 16/16 positions
+ok teacher forcing chunk: 44/44 positions
+ok teacher forcing long: 76/76 positions
+ok oracle bites: corrupted expert scales diverge in 2/3 cases
+kimi-k3-tiny-check: all checks passed
+OK kimi_k3 tier f32 short: tokens = CPU, device 55 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier f32 chunk: tokens = CPU, device 109 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier f32 long: tokens = CPU, device 326 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier f32, shared experts on the device short: tokens = CPU, device 55 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier f32, shared experts on the device chunk: tokens = CPU, device 111 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier f32, shared experts on the device long: tokens = CPU, device 326 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=8, shared experts on the device short: tokens = CPU, device 54 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=8, shared experts on the device chunk: tokens = CPU, device 109 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=8, shared experts on the device long: tokens = CPU, device 312 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=4, shared experts on the device short: tokens = CPU, device 54 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=4, shared experts on the device chunk: tokens = CPU, device 113 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier K3_BITS=4, shared experts on the device long: tokens = CPU, device 334 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, prefill one token at a time short: tokens = CPU, device 96 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, prefill one token at a time chunk: tokens = CPU, device 345 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, prefill one token at a time long: tokens = CPU, device 602 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, loads not pipelined short: tokens = CPU, device 55 of 120 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, loads not pipelined chunk: tokens = CPU, device 111 of 376 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, loads not pipelined long: tokens = CPU, device 326 of 632 routed experts, evictions 0, shared experts on the device
+OK kimi_k3 tier, a budget of two experts short: tokens = CPU, device 5 of 120 routed experts, evictions 1, shared experts on the device
+OK kimi_k3 tier, a budget of two experts chunk: tokens = CPU, device 8 of 376 routed experts, evictions 2, shared experts on the device
+OK kimi_k3 tier, a budget of two experts long: tokens = CPU, device 13 of 632 routed experts, evictions 5, shared experts on the device
+OK kimi_k3 K3_VK=1 / K3_VK_GB / K3_VK=0: the shared tier's switches
+OK kimi_k3 warm start: tokens = CPU, warm start, 30 experts, device 632 of 632 routed experts
+OK kimi_k3 COLI_VK_TIER=0: tokens = CPU, no tier, 84 matmuls on the GPU

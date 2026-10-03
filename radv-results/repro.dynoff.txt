@@ -1,0 +1,30 @@
+=== dynoff 4 160 0 0 0 twin=0 ===
+h window 1: h0=2001 want 2001 ok
+expert 2: 0 of 160 wrong
+window 2: y0=4003 want 4003 ok
+h window 2: h0=4002 want 4002 ok
+expert 3: 0 of 160 wrong
+window 3: y0=6004 want 6004 ok
+h window 3: h0=6003 want 6003 ok
+dynoff K=4 N=160 h=host-visible offsets=dynamic gap=0 twin=0 align=16 -> PASS
+rc=0
+=== dynoff 4 160 0 0 0 twin=1 ===
+h window 1: h0=2001 want 2001 ok
+expert 2: 0 of 160 wrong
+window 2: y0=4003 want 4003 ok
+h window 2: h0=4002 want 4002 ok
+expert 3: 0 of 160 wrong
+window 3: y0=6004 want 6004 ok
+h window 3: h0=6003 want 6003 ok
+dynoff K=4 N=160 h=host-visible offsets=dynamic gap=0 twin=1 align=16 -> PASS
+rc=0
+=== dynoff 4 160 0 0 0 twin=2 ===
+h window 1: h0=2001 want 2001 ok
+expert 2: 0 of 160 wrong
+window 2: y0=4003 want 4003 ok
+h window 2: h0=4002 want 4002 ok
+expert 3: 0 of 160 wrong
+window 3: y0=6004 want 6004 ok
+h window 3: h0=6003 want 6003 ok
+dynoff K=4 N=160 h=host-visible offsets=dynamic gap=0 twin=2 align=16 -> PASS
+rc=0

@@ -1,0 +1,109 @@
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function  -MMD -MP -DCOLI_VULKAN inkling.c   backend_vulkan.o vk_tier.o -o inkling -lm -fopenmp -pthread  -lvulkan
+gcc -O3 -march=native -fopenmp -pthread -Wall -Wextra -Wno-unused-parameter -Wno-misleading-indentation -Wno-unused-function -MMD -MP -DCOLI_VULKAN olmoe.c backend_vulkan.o vk_tier.o -o olmoe -lm -fopenmp -pthread -lvulkan
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 130.51it/s]
+saved tiny model + ref_inkling.json to tiny_inkling/
+continuation: [93, 191, 153, 128, 13, 74, 236, 154, 189, 87, 196, 84, 177, 238, 73, 30, 216, 93, 191, 153, 128, 13, 74, 236]
+OK inkling f32 cap=1: Matching tokens: 24/24, 2076 matmuls on the GPU
+OK inkling f32 cap=2: Matching tokens: 24/24, 2076 matmuls on the GPU
+OK inkling f32 cap=8: Matching tokens: 24/24, 2076 matmuls on the GPU
+OK inkling bf16: tokens = CPU, 2076 matmuls on the GPU
+[1/3] indicizzo 1 shard (solo header)…
+      densa da convertire: 160 tensori  {'int8': 4, 'raw': 100, 'gs4': 56}
+      input  bf16/f32 :    0.00 GB
+      output stimato   :    0.00 GB   (27%)
+      spazio libero    :  358.50 GB
+[2/3] costruisco l'header di output…
+[3/3] scrivo tiny_inkling_q/dense-int4g64.safetensors  (0.00 GB payload)…
+      100/160  (0s)
+
+✅ scritto tiny_inkling_q/dense-int4g64.safetensors  0.00 GB  in 0s
+
+=== errore di quantizzazione (L2 relativo, sui pesi VERI) ===
+  attention    10.795%   (su 40 tensori)
+  embed/head   0.592%   (su 2 tensori)
+  mlp denso    7.382%   (su 6 tensori)
+  shared       10.747%   (su 12 tensori)
+OK inkling int4-g64 container: tokens = CPU, 2076 matmuls on the GPU
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 129.13it/s]
+wrote tiny OLMoE source checkpoint: /home/crichalchemist/colibri-radv/c/olmoe_tiny
+  wrote model-00000.safetensors (39 tensors)
+  32/32 experts converted...
+  wrote model-00001.safetensors (64 tensors)
+Done: 32 experts, 39 dense tensors converted.
+OK olmoe: Matching tokens: 8/8, 168 matmuls on the GPU
+fake TML checkpoint: tiny_inkling_x-tml (164 tensors)
+model-00001-of-00001.safetensors (0.0G) -> out-00001.safetensors (0.0G) in 0s
+conversion complete -> tiny_inkling_x-pass
+model-00001-of-00001.safetensors (0.0G) -> out-00001.safetensors (0.0G) in 0s
+conversion complete -> tiny_inkling_x-i4
+model-00001-of-00001.safetensors (0.0G) -> out-00001.safetensors (0.0G) in 0s
+conversion complete -> tiny_inkling_x-i8
+wrote Edge fixture tokenizer: olmoe_tiny_c/tokenizer.json
+OK inkling tier tiny_inkling cap=1: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling cap=8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_bf16 cap=1: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_bf16 cap=8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_q cap=1: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_q cap=8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_x-i4 cap=1: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_x-i4 cap=8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_x-i8 cap=1: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier tiny_inkling_x-i8 cap=8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier runtime int4: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier runtime int8: tokens = CPU, device 420 of 852 routed experts, evictions 0, trunk on the device
+OK inkling tier TOPP: tokens = CPU, device 210 of 426 routed experts, evictions 0, trunk on the device
+OK inkling tier alone (COLI_VK_DENSE=0): tokens = CPU, device 259 of 852 routed experts, evictions 0, trunk on the CPU
+OK inkling tier, a budget of two experts: tokens = CPU, device 29 of 852 routed experts, evictions 2, trunk on the device
+OK olmoe tier cap=1: tokens = CPU, device 49 of 104 routed experts, evictions 0, trunk on the device
+OK olmoe tier cap=8: tokens = CPU, device 35 of 104 routed experts, evictions 0, trunk on the device
+OK olmoe tier PILOT: tokens = CPU, device 45 of 104 routed experts, evictions 0, trunk on the device
+OK olmoe tier alone (COLI_VK_DENSE=0): tokens = CPU, device 34 of 104 routed experts, evictions 0, trunk on the CPU
+OK olmoe tier, a budget of three experts: tokens = CPU, device 5 of 104 routed experts, evictions 2, trunk on the device
+OK inkling tier warm start: text = CPU, warm start, 48 experts, device 372 of 372 routed experts
+OK olmoe tier warm start: tokens = CPU, warm start, 27 experts, device 104 of 104 routed experts
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=9 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=6 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=5 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/suite.py:166: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  setUpClass()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/suite.py:166: ResourceWarning: unclosed file <_io.FileIO name=5 mode='rb' closefd=True>
+  setUpClass()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..
+----------------------------------------------------------------------
+Ran 5 tests in 0.599s
+
+OK
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=9 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=6 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/linuxbrew/.linuxbrew/Cellar/python@3.14/3.14.4/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.FileIO name=5 mode='rb' closefd=True>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....../home/crichalchemist/colibri-radv/c/tests/test_olmoe_dashboard_hits.py:74: ResourceWarning: unclosed file <_io.FileIO name=7 mode='rb' closefd=True>
+  cls.lines = one_turn()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/home/crichalchemist/colibri-radv/c/tests/test_olmoe_dashboard_hits.py:74: ResourceWarning: unclosed file <_io.FileIO name=5 mode='rb' closefd=True>
+  cls.lines = one_turn()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..........ssssss
+----------------------------------------------------------------------
+Ran 22 tests in 1.493s
+
+OK (skipped=6)

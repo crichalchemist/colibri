@@ -1,0 +1,54 @@
+### macports141 vary=0
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.1 | subgroupSize 64 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size off
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+### macports141 vary=1
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.1 | subgroupSize 64 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size on
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+### macports141 vary=2
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.1 | subgroupSize 64 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size on + require full subgroups
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+### sdk142 vary=0
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.2 | subgroupSize 32 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size off
+gl_SubgroupSize        32  (1 distinct) max=32
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 32, counted 64 -> INCONSISTENT
+### sdk142 vary=1
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.2 | subgroupSize 32 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size on
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT
+### sdk142 vary=2
+device AMD Radeon Pro 580 | driver MoltenVK 1.4.2 | subgroupSize 32 | ops 0x6ff | stages 0x32
+sgprobe: allow varying subgroup size on + require full subgroups
+gl_SubgroupSize        64  (1 distinct) max=64
+shuffleXor(lane, 32) partner right 1  (1 distinct) max=1
+butterfly over masks 1..16 (32 if right) 32  (1 distinct) max=32
+butterfly over masks 1..32 (64 if right) 64  (1 distinct) max=64
+subgroupAdd(1)         64  (1 distinct) max=64
+sgprobe: reported 64, counted 64 -> CONSISTENT

@@ -1,0 +1,132 @@
+[VK] VRAM pressure-proofing: memory_priority on, memory_budget on
+[VK] warning: only 256 of 7936 MB VRAM is host-visible (Resizable BAR appears disabled) — allocations beyond the 256 MB window fall back to system RAM and will be slow. Enable Resizable BAR / Smart Access Memory in the BIOS.
+[VK] ready: AMD Radeon Pro 580X (RADV POLARIS10), compute qfam 0, memtype 3, fused gate+up, absorb attention, tiled GEMM from S=2 and S*O>=4096
+fmt=1 S=1 I=6144 O=1536 gemv | maxerr=3.815e-05 maxrel=0.0003662 | gpu=1.168 ms  cpu_ref=19.745 ms
+fmt=2 S=1 I=6144 O=1536 gemv | maxerr=2.384e-06 maxrel=4.292e-05 | gpu=0.713 ms  cpu_ref=30.265 ms
+fmt=1 S=1 I=1536 O=6144 gemv | maxerr=1.526e-05 maxrel=0.0001321 | gpu=1.016 ms  cpu_ref=20.396 ms
+fmt=2 S=8 I=6144 O=1536 gemv | maxerr=2.384e-06 maxrel=0.0001341 | gpu=4.281 ms  cpu_ref=198.063 ms
+fmt=1 S=1 I=512 O=512 gemv | maxerr=5.722e-06 maxrel=8.594e-06 | gpu=0.109 ms  cpu_ref=1.652 ms
+fmt=2 S=1 I=16384 O=6144 gemv | maxerr=6.199e-06 maxrel=0.0001937 | gpu=5.893 ms  cpu_ref=269.235 ms
+fmt=5 S=1 I=6144 O=2048 gemv | maxerr=7.153e-07 maxrel=1.21e-05 | gpu=0.777 ms  cpu_ref=43.887 ms
+fmt=5 S=1 I=2048 O=6144 gemv | maxerr=4.768e-07 maxrel=1.408e-05 | gpu=0.728 ms  cpu_ref=42.600 ms
+fmt=5 S=8 I=6144 O=2048 gemv | maxerr=9.537e-07 maxrel=3.464e-05 | gpu=4.689 ms  cpu_ref=345.888 ms
+fmt=5 S=1 I=100 O=64 gemv | maxerr=5.96e-08 maxrel=1.69e-06 | gpu=0.086 ms  cpu_ref=0.065 ms
+fmt=5 S=1 I=16384 O=6144 gemv | maxerr=1.907e-06 maxrel=6.317e-05 | gpu=5.089 ms  cpu_ref=339.697 ms
+fmt=10 S=1 I=6144 O=1536 gemv | maxerr=1.526e-05 maxrel=0.0001645 | gpu=4.312 ms  cpu_ref=20.810 ms
+fmt=10 S=8 I=2048 O=512 gemv | maxerr=7.629e-06 maxrel=8.447e-05 | gpu=3.433 ms  cpu_ref=19.625 ms
+fmt=10 S=1 I=16384 O=512 gemv | maxerr=3.815e-05 maxrel=2.817e-05 | gpu=3.711 ms  cpu_ref=18.124 ms
+fmt=10 S=3 I=37 O=5 gemv | maxerr=1.192e-07 maxrel=1.269e-06 | gpu=0.042 ms  cpu_ref=0.001 ms
+fmt=11 S=1 I=6144 O=1536 gemv | maxerr=1.717e-05 maxrel=5.939e-05 | gpu=2.199 ms  cpu_ref=20.864 ms
+fmt=11 S=8 I=2048 O=512 gemv | maxerr=7.629e-06 maxrel=5.287e-05 | gpu=0.950 ms  cpu_ref=18.124 ms
+fmt=11 S=1 I=16384 O=512 gemv | maxerr=4.959e-05 maxrel=0.0001004 | gpu=1.982 ms  cpu_ref=18.865 ms
+fmt=11 S=3 I=37 O=5 gemv | maxerr=4.768e-07 maxrel=2.73e-07 | gpu=0.050 ms  cpu_ref=0.001 ms
+fmt=12 gs=64 S=1 I=6144 O=1536 gemv | maxerr=3.242e-05 maxrel=0.0001413 | gpu=1.298 ms  cpu_ref=111.334 ms
+fmt=12 gs=64 S=8 I=2048 O=512 gemv | maxerr=1.907e-05 maxrel=0.0002937 | gpu=0.436 ms  cpu_ref=97.662 ms
+fmt=12 gs=64 S=1 I=16384 O=512 gemv | maxerr=9.155e-05 maxrel=8.703e-05 | gpu=1.054 ms  cpu_ref=100.467 ms
+fmt=12 gs=64 S=3 I=100 O=5 gemv | maxerr=9.537e-07 maxrel=4.709e-07 | gpu=0.042 ms  cpu_ref=0.017 ms
+fmt=12 gs=32 S=2 I=4096 O=256 gemv | maxerr=1.717e-05 maxrel=3.025e-05 | gpu=0.188 ms  cpu_ref=24.825 ms
+fmt=12 gs=128 S=2 I=4096 O=256 gemv | maxerr=2.289e-05 maxrel=9.353e-05 | gpu=0.172 ms  cpu_ref=24.532 ms
+fmt=13 gs=64 S=1 I=6144 O=1536 gemv | maxerr=2.289e-05 maxrel=0.0002004 | gpu=1.295 ms  cpu_ref=21.072 ms
+fmt=13 gs=64 S=8 I=2048 O=512 gemv | maxerr=1.526e-05 maxrel=0.0001727 | gpu=0.295 ms  cpu_ref=17.252 ms
+fmt=13 gs=64 S=1 I=16384 O=512 gemv | maxerr=4.578e-05 maxrel=0.0003054 | gpu=1.224 ms  cpu_ref=18.000 ms
+fmt=13 gs=64 S=3 I=100 O=5 gemv | maxerr=1.907e-06 maxrel=1.719e-07 | gpu=0.052 ms  cpu_ref=0.003 ms
+fmt=13 gs=128 S=2 I=4096 O=256 gemv | maxerr=1.526e-05 maxrel=6.284e-05 | gpu=0.195 ms  cpu_ref=4.369 ms
+fmt=1 S=16 I=1001 O=193 gemm | maxerr=2.289e-05 maxrel=6.147e-05 | gpu=0.298 ms  cpu_ref=6.360 ms
+fmt=1 S=64 I=1536 O=97 gemm | maxerr=2.289e-05 maxrel=0.0003758 | gpu=0.476 ms  cpu_ref=20.193 ms
+fmt=1 S=512 I=520 O=131 gemm | maxerr=1.526e-05 maxrel=0.0005495 | gpu=0.420 ms  cpu_ref=75.685 ms
+fmt=2 S=16 I=1001 O=193 gemm | maxerr=1.192e-06 maxrel=2.462e-05 | gpu=0.308 ms  cpu_ref=8.030 ms
+fmt=2 S=64 I=1536 O=97 gemm | maxerr=1.907e-06 maxrel=4.873e-05 | gpu=0.483 ms  cpu_ref=25.281 ms
+fmt=2 S=512 I=520 O=131 gemm | maxerr=9.537e-07 maxrel=2.834e-05 | gpu=0.435 ms  cpu_ref=95.430 ms
+fmt=4 gs=64 S=16 I=1001 O=193 gemm | maxerr=1.431e-06 maxrel=1.498e-05 | gpu=0.341 ms  cpu_ref=8.442 ms
+fmt=4 gs=64 S=64 I=1536 O=97 gemm | maxerr=1.431e-06 maxrel=4.054e-05 | gpu=0.534 ms  cpu_ref=26.429 ms
+fmt=4 gs=64 S=512 I=520 O=131 gemm | maxerr=7.153e-07 maxrel=2.659e-05 | gpu=0.449 ms  cpu_ref=97.486 ms
+fmt=5 S=16 I=1001 O=193 gemm | maxerr=4.768e-07 maxrel=1.847e-05 | gpu=0.377 ms  cpu_ref=10.869 ms
+fmt=5 S=64 I=1536 O=97 gemm | maxerr=7.153e-07 maxrel=1.656e-05 | gpu=0.592 ms  cpu_ref=36.322 ms
+fmt=5 S=512 I=520 O=131 gemm | maxerr=3.576e-07 maxrel=1.37e-05 | gpu=0.442 ms  cpu_ref=122.908 ms
+fmt=7 gs=32 S=16 I=1001 O=193 gemm | maxerr=5.364e-07 maxrel=1.473e-05 | gpu=0.498 ms  cpu_ref=19.256 ms
+fmt=7 gs=32 S=64 I=1536 O=97 gemm | maxerr=9.537e-07 maxrel=2.199e-05 | gpu=0.740 ms  cpu_ref=59.377 ms
+fmt=7 gs=32 S=512 I=520 O=131 gemm | maxerr=4.768e-07 maxrel=1.824e-05 | gpu=0.563 ms  cpu_ref=217.446 ms
+fmt=10 S=16 I=1001 O=193 gemm | maxerr=7.629e-06 maxrel=6.534e-05 | gpu=0.629 ms  cpu_ref=6.446 ms
+fmt=10 S=64 I=1536 O=97 gemm | maxerr=1.144e-05 maxrel=0.000104 | gpu=0.625 ms  cpu_ref=20.055 ms
+fmt=10 S=512 I=520 O=131 gemm | maxerr=5.722e-06 maxrel=0.0001239 | gpu=0.483 ms  cpu_ref=74.970 ms
+fmt=11 S=16 I=1001 O=193 gemm | maxerr=7.629e-06 maxrel=0.0001996 | gpu=0.479 ms  cpu_ref=6.781 ms
+fmt=11 S=64 I=1536 O=97 gemm | maxerr=1.144e-05 maxrel=0.0001265 | gpu=0.717 ms  cpu_ref=20.869 ms
+fmt=11 S=512 I=520 O=131 gemm | maxerr=5.722e-06 maxrel=0.0001708 | gpu=0.445 ms  cpu_ref=78.935 ms
+fmt=12 gs=64 S=16 I=1001 O=193 gemm | maxerr=3.052e-05 maxrel=0.0002141 | gpu=0.619 ms  cpu_ref=49.483 ms
+fmt=12 gs=64 S=64 I=1536 O=97 gemm | maxerr=3.052e-05 maxrel=0.0005084 | gpu=0.786 ms  cpu_ref=145.020 ms
+fmt=12 gs=64 S=512 I=520 O=131 gemm | maxerr=1.907e-05 maxrel=0.0002559 | gpu=0.453 ms  cpu_ref=476.733 ms
+fmt=13 gs=64 S=16 I=1001 O=193 gemm | maxerr=1.526e-05 maxrel=0.000205 | gpu=0.379 ms  cpu_ref=6.544 ms
+fmt=13 gs=64 S=64 I=1536 O=97 gemm | maxerr=2.098e-05 maxrel=0.0001907 | gpu=0.606 ms  cpu_ref=20.084 ms
+fmt=13 gs=64 S=512 I=520 O=131 gemm | maxerr=1.144e-05 maxrel=0.000587 | gpu=0.450 ms  cpu_ref=79.677 ms
+fmt=1 S=37 I=999 O=65 gemm | maxerr=1.907e-05 maxrel=0.0001121 | gpu=0.360 ms  cpu_ref=5.170 ms
+fmt=4 gs=8 S=33 I=1001 O=70 gemm | maxerr=9.537e-07 maxrel=2.155e-05 | gpu=0.372 ms  cpu_ref=8.028 ms
+fmt=4 gs=24 S=33 I=1001 O=70 gemm | maxerr=1.192e-06 maxrel=2.7e-05 | gpu=0.636 ms  cpu_ref=11.557 ms
+fmt=12 gs=12 S=33 I=1001 O=70 gemm | maxerr=3.052e-05 maxrel=0.0002129 | gpu=0.359 ms  cpu_ref=34.564 ms
+fmt=12 gs=128 S=33 I=1001 O=70 gemm | maxerr=2.289e-05 maxrel=0.0003628 | gpu=0.328 ms  cpu_ref=27.285 ms
+fmt=13 gs=12 S=33 I=1001 O=70 gemm | maxerr=1.526e-05 maxrel=0.0002283 | gpu=0.365 ms  cpu_ref=4.560 ms
+xbatch: tier queue of its own, GEMM route from 16 rows, timestamps on
+tier pool: 10 experts fit a budget of 10.5 (87040 bytes each), refusals 1, 1 block(s), frag 0.000
+tier pool: frees during a batch held 870400 -> 870400 bytes, after the join 609280
+tier pool: 3 of 3 experts uploaded again into the freed room, 1 blocks, 870400 of 913408 bytes used
+tier pool: all freed, 0 bytes used, 0 live ranges, 1 block(s) kept
+xbatch fmt=1/1 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.3e-05 | row bits independent of the batch: yes | device 0.218 ms
+xbatch fmt=2/2 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.49e-05 | row bits independent of the batch: yes | device 0.208 ms
+xbatch fmt=4/4 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.4e-05 | row bits independent of the batch: yes | device 0.226 ms
+xbatch fmt=5/5 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.33e-05 | row bits independent of the batch: yes | device 0.223 ms
+xbatch fmt=7/7 gs=32 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.56e-05 | row bits independent of the batch: yes | device 0.307 ms
+xbatch fmt=10/10 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.84e-05 | row bits independent of the batch: yes | device 0.374 ms
+xbatch fmt=11/11 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.33e-05 | row bits independent of the batch: yes | device 0.292 ms
+xbatch fmt=12/12 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.79e-05 | row bits independent of the batch: yes | device 0.322 ms
+xbatch fmt=13/13 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.3e-05 | row bits independent of the batch: yes | device 0.346 ms
+xbatch fmt=4/1 gs=64 D=320 I=160 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.52e-05 | row bits independent of the batch: yes | device 0.304 ms
+xbatch fmt=4/4 gs=64 D=320 I=160 swiglu-limit, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.52e-05 | row bits independent of the batch: yes | device 0.318 ms
+xbatch fmt=7/7 gs=32 D=320 I=160 situ, rows 1/3/2/20/1 (GEMM from 16) | maxrel=6.7e-05 | row bits independent of the batch: yes | device 0.411 ms
+xbatch fmt=12/12 gs=8 D=200 I=72 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.12e-05 | row bits independent of the batch: yes | device 0.271 ms
+xbatch fmt=2/2 gs=0 D=200 I=72 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=1.11e-05 | row bits independent of the batch: yes | device 0.215 ms
+xbatch fmt=4/4 gs=64 D=6400 I=64 swiglu, rows 1/3/2/20/1 (GEMM from 16) | maxrel=2.74e-05 | row bits independent of the batch: yes | device 2.732 ms
+xbatch v4 D=160 I=160, rows 1/3/20 (GEMM from 16) | 0 of 3840 values differ from the CPU's arithmetic | device 0.199 ms
+BATCHED int4 S=1 6144->2048 (our gate/up): 0.6301 ms/matmul (N=64, one submit)
+BATCHED int4 S=1 2048->6144 (our down):    0.5947 ms/matmul (N=64, one submit)
+gate_up(fused) fmt=2 S=1 D=6144 I=2048 | maxrel=0.0001107
+gate_up(fused) fmt=5 S=1 D=6144 I=2048 | maxrel=6.888e-05
+BATCHED fused gate_up int4 6144->2048:     1.2906 ms (N=64, SAME expert = L2-cached)
+FAIR fused gate_up int4 6144->2048 (8 distinct experts): 1.3043 ms/expert
+FAIR fused gate_up int3 6144->2048 (8 distinct experts): 1.1342 ms/expert
+FULL VK expert_group fmt=2  1 experts | maxrel=0.0006866 | per-call 2.2011  GPU-only 2.1983 ms/expert (ROCm 0.179)
+FULL VK expert_group fmt=2  8 experts | maxrel=0.0009349 | per-call 1.9239  GPU-only 1.9126 ms/expert (ROCm 0.179)
+FULL VK expert_group fmt=2 32 experts | maxrel=0.001241 | per-call 1.8641  GPU-only 1.8557 ms/expert (ROCm 0.179)
+qprep fmt=1 S=1 I=6144 (1536->16384, kv 576) | maxrel q 0.00267 kv 9.044e-05
+qprep fmt=1 S=11 I=6144 (1536->16384, kv 576) | maxrel q 0.005456 kv 0.00115
+qprep fmt=1 S=2 I=6144 (1536->16384, kv 576) | maxrel q 0.002796 kv 8.794e-05
+qprep fmt=2 S=1 I=6144 (1536->16384, kv 576) | maxrel q 0.0005565 kv 0.0005095
+fmt=4 gs=64 S=1 I=6144 O=2048 gemv | maxerr=1.252e-06 maxrel=3.339e-05 | gpu=0.994 ms  cpu_ref=33.041 ms
+fmt=4 gs=64 S=1 I=2048 O=6144 gemv | maxerr=9.537e-07 maxrel=2.498e-05 | gpu=0.877 ms  cpu_ref=33.050 ms
+fmt=4 gs=64 S=8 I=6144 O=1536 gemv | maxerr=1.907e-06 maxrel=6.893e-05 | gpu=4.877 ms  cpu_ref=199.155 ms
+fmt=4 gs=64 S=1 I=16384 O=6144 gemv | maxerr=3.338e-06 maxrel=5.608e-05 | gpu=6.500 ms  cpu_ref=277.132 ms
+fmt=4 gs=32 S=1 I=6144 O=2048 gemv | maxerr=1.907e-06 maxrel=5.869e-05 | gpu=0.973 ms  cpu_ref=35.088 ms
+FULL VK expert_group fmt=4  8 experts | maxrel=0.0006111 | per-call 2.1694  GPU-only 2.1645 ms/expert (ROCm 0.179)
+FULL VK expert_group fmt=5  1 experts | maxrel=6.939e-05 | per-call 1.9287  GPU-only 1.8302 ms/expert (ROCm 0.179)
+FULL VK expert_group fmt=5  8 experts | maxrel=8.627e-05 | per-call 1.6991  GPU-only 1.6179 ms/expert (ROCm 0.179)
+FULL VK expert_group fmt=5 32 experts | maxrel=0.0001975 | per-call 1.6065  GPU-only 1.5729 ms/expert (ROCm 0.179)
+matmul_pair fmt=2 6144->(2048,576)   | maxrel=6.841e-05 | 1.073 ms/pair-call
+matmul_pair fmt=5 6144->(2048,576)   | maxrel=1.711e-05 | 0.967 ms/pair-call
+matmul_pair fmt=4 6144->(2048,576)   | maxrel=5.083e-05 | 1.224 ms/pair-call
+absorb fmt=2 S=1 H=64 Q=192 R=64 V=256 K=512 st0=0 T=300 | maxerr=2.496e-07 maxrel=1.35e-05 | 1.649 ms/call
+absorb+project fused                  | maxrel=3.608e-06 | 2.090 ms/call (unfused absorb was 1.649)
+absorb fmt=2 S=1 H=64 Q=192 R=64 V=256 K=512 st0=17 T=300 | maxerr=2.98e-07 maxrel=1.263e-05 | 1.596 ms/call
+absorb+project fused                  | maxrel=2.434e-05 | 2.147 ms/call (unfused absorb was 1.596)
+absorb fmt=2 S=2 H=64 Q=192 R=64 V=256 K=512 st0=0 T=300 | maxerr=3.129e-07 maxrel=1.851e-05 | 1.698 ms/call
+absorb+project fused                  | maxrel=9.077e-06 | 2.607 ms/call (unfused absorb was 1.698)
+absorb fmt=1 S=1 H=8 Q=128 R=32 V=64 K=256 st0=0 T=64 | maxerr=3.91e-05 maxrel=0.0001788 | 0.301 ms/call
+absorb+project fused                  | maxrel=0.002994 | 0.343 ms/call (unfused absorb was 0.301)
+absorb fmt=2 S=1 H=64 Q=192 R=64 V=256 K=512 st0=0 T=2000 | maxerr=2.682e-07 maxrel=1.801e-05 | 7.091 ms/call
+absorb+project fused                  | maxrel=2.216e-06 | 7.533 ms/call (unfused absorb was 7.091)
+absorb fmt=5 S=1 H=64 Q=192 R=64 V=256 K=512 st0=0 T=300 | maxerr=6.426e-08 maxrel=4.751e-06 | 1.703 ms/call
+absorb+project fused                  | maxrel=2.233e-07 | 2.137 ms/call (unfused absorb was 1.703)
+absorb fmt=5 S=2 H=64 Q=192 R=64 V=256 K=512 st0=17 T=300 | maxerr=8.196e-08 maxrel=4.519e-06 | 1.693 ms/call
+absorb+project fused                  | maxrel=2.299e-07 | 2.586 ms/call (unfused absorb was 1.693)
+absorb fmt=4 S=1 H=64 Q=192 R=64 V=256 K=512 st0=0 T=300 | maxerr=2.086e-07 maxrel=1.473e-05 | 1.803 ms/call
+absorb+project fused                  | maxrel=4.32e-05 | 2.326 ms/call (unfused absorb was 1.803)
+absorb fmt=4 S=2 H=64 Q=192 R=64 V=256 K=512 st0=17 T=300 | maxerr=3.129e-07 maxrel=1.532e-05 | 1.805 ms/call
+absorb+project fused                  | maxrel=5.599e-06 | 2.735 ms/call (unfused absorb was 1.805)
+FAIL

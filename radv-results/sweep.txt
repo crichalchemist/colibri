@@ -1,0 +1,8 @@
+shader exit=0 (run separately)
+qwen exit=0 (106s)
+inkling-olmoe exit=0 (34s)
+mimo-qwenimage exit=1 (34s)
+kimi exit=0 (15s)
+deepseek exit=0 (72s)
+glm exit=1 (66s)
+SWEEP COMPLETE

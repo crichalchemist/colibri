@@ -1,0 +1,4 @@
+alias.dyn.metal:34:38: error: use of undeclared identifier '_27'
+    (*spvDescriptorSet0.m_20).y[i] = _27.x[i] + ((device float*)&_36.x4[i >> 2u])[i & 3u];
+                                     ^
+1 error generated.
