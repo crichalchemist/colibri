@@ -26,15 +26,14 @@ Set `COLI_NO_OMP_TUNE=1` on multi-core boxes: the engine's OMP self-tune
 Vulkan, and spinning worker threads starve the async I/O pool (measured
 CPU expert bandwidth 28 → 5 GB/s without it).
 
-**Discrete cards need Resizable BAR.** The weight tiers allocate
-HOST_VISIBLE|DEVICE_LOCAL memory; with ReBAR disabled that combination only
-exists in a ~256 MB BAR window, and the driver silently places everything
-beyond it in system RAM — the tier then *reports* resident experts while every
-access crosses PCIe, slower than the CPU path (measured 0.11 vs 0.24 tok/s
-either side of the BIOS toggle on an RX 9070 XT). The engine now warns at init
-when the host-visible slice of VRAM is small; if you see that warning, enable
-Resizable BAR / Smart Access Memory in the BIOS. Unified-memory APUs are
-unaffected.
+**Discrete cards without Resizable BAR** expose HOST_VISIBLE|DEVICE_LOCAL memory
+only as a ~256 MB window. Writing the weights through a mapping of that window, as
+the backend does on every other device, either fails past it (NVIDIA) or lands in
+system RAM read over PCIe (RADV: measured 0.11 against 0.24 tok/s either side of
+the BIOS toggle on an RX 9070 XT). On such a card the backend now copies resident
+data into device-local memory through a staging buffer instead, on its own; see
+[Memory placement without Resizable BAR](#memory-placement-without-resizable-bar).
+Unified-memory APUs and cards with Resizable BAR keep the mapped path.
 
 The compiled shaders are found via `COLI_VK_SHADERS` (either the
 `qmatmul.spv` file or the directory holding the `.spv` set); unset, the
@@ -674,8 +673,9 @@ to the next. qwen36 (Qwen3.6, Qwen3-Coder, Qwen3.8-27B) and qwen38 (Qwen3.8 Flas
 Next) run it: by default on a discrete GPU, and for qwen36 on an integrated one with
 the expert tier (see [the default](#the-chain-on-a-radeon-780m)); `COLI_VK_CHAIN=1`
 anywhere. olmoe and inkling run it as well ([OLMoE and Inkling](#olmoe-and-inkling)).
-colibri (GLM-5.2) and glm53 (GLM-5.3 Flash) run it too, with the MLA,
-KDA and hyper-connection ops ([below](#glm-52-and-glm-53-flash-on-the-chain)).
+colibri (GLM-5.2), glm53 (GLM-5.3 Flash) and kimi_k3 run it too, with the MLA,
+KDA and hyper-connection ops ([below](#glm-52-and-glm-53-flash-on-the-chain)), and
+deepseek_v41 and deepseek_v4 with DeepSeek's own ([below](#deepseek-v41-flash-and-deepseek-v4-on-the-chain)).
 
 **What runs where, per layer** (S rows: one at decode, a prompt chunk at prefill):
 
@@ -742,7 +742,7 @@ f32 throughout, as the CPU's f32 path.
 
 | Variable | Default | Effect |
 |---|---|---|
-| `COLI_VK_CHAIN` | on for a discrete GPU; on an integrated GPU with the expert tier, what the engine measured (qwen36 and olmoe on, qwen38 off; mimo, inkling, colibri and glm53 off: not measured); off on a CPU device | `1`: every layer's dense chain on the device; `2`: prompts only (forwards of more than two rows; decode and MTP verifies on the per-matrix path, the state moving between the two); `0`: the per-matrix path. The `[VK] <engine>: dense chain ...` line says which and why. |
+| `COLI_VK_CHAIN` | on for a discrete GPU; on an integrated GPU with the expert tier, what the engine measured (qwen36 and olmoe on, qwen38 off; mimo, inkling, colibri, glm53, kimi_k3, deepseek_v41 and deepseek_v4 off: not measured); off on a CPU device | `1`: every layer's dense chain on the device; `2`: prompts only (forwards of more than two rows; decode and MTP verifies on the per-matrix path, the state moving between the two); `0`: the per-matrix path. The `[VK] <engine>: dense chain ...` line says which and why. |
 | `COLI_VK_CHAIN_ROWS` | `512` | Prompt rows per chunk: a longer prompt runs every layer chunk by chunk (the device's scratch is sized for one chunk). |
 | `COLI_VK_CHAIN_GEMV` | on | `0`: the decode matrices take `qmatmul.comp`'s GEMV instead of `chain_gemv.comp`'s. |
 | `COLI_VK_CHAIN_SPIN_US` | `2000` | How long a wait on a chain frame polls the fence before blocking. |
@@ -1078,6 +1078,232 @@ the tiny fixtures, on Lavapipe and on the 780M:
 [VK] colibri: dense chain off (an integrated GPU with the expert tier: not measured; COLI_VK_CHAIN=0 off, 1 on, 2 prompts only)
 ```
 
+### DeepSeek V4.1 Flash and DeepSeek V4 on the chain
+
+`deepseek_v41_chain.h` (deepseek_v41) follows the recipe below with the
+[DeepSeek ops](#deepseek-v41-flash-and-deepseek-v4s-attention-vkc_dsv4), the mHC ops and
+the per-head blocks of `vkc_mla_hgemv`. The residual is `hc_mult` streams per position,
+and V4.1 collapses a site with the mix the site before it computed. What runs where, per
+layer:
+
+| | deepseek_v41 (DeepSeek V4.1 Flash) |
+|---|---|
+| device, frame A1 | the previous layer's FFN branch (the routed sum plus the shared expert) written back into the streams; on an engram layer the engram (`eng_wkv` over the n-gram rows the host looked up, the gate into each stream); on a DSpark target layer the streams' mean for the draft head; the attention site's mix, split with Sinkhorn, collapse and norm; the attention: `wq_a`, its norm, `wq_b`, `wkv`, its norm, RoPE on interleaved pairs, the new rows into the window ring; on a kv_source layer the compressor's rolling group, the pooled latent's norm, the index keys and the compressed rows' RoPE; on an index source the indexer (its queries and RoPE, `weights_proj`, the scores against the keys the CPU would read, the candidate blocks, the top-k); the sparse attention with the sink over the window and the selection, the inverse RoPE, the grouped `wo_a`, `wo_b`; the write back; the FFN site's mix, collapse and norm |
+| host | `moe_run_at` without the shared expert: the router and the routed experts (the tier's batch and the CPU's share); an engram layer's n-gram rows are looked up (on disk) as its frame is recorded |
+| device, frame A2 (not waited for) | the shared expert (clamped SwiGLU) |
+| after the last layer | the final streams and the last site's mix back to the host, which collapses them and runs the final norm and the head as before |
+
+**The state.** The host's stays canonical. What a forward changes there, the window ring
+and its position map, the compressed rows and index keys, the compressor's group and the
+published index keys, is written back once the forward's last frame is through, exactly
+as the CPU would have left it, a speculative verify's undo rows included. The device
+mirrors the window ring (window + chunk rows, so a chunk never overwrites a row one of
+its earlier rows still reads) behind a watermark, each kv_source layer's compressed rows
+and index keys behind one of their own (grown in powers of two), and takes the
+compressor's group up at every forward. Every host write lowers the watermarks: a CPU
+forward, a rejected draft, a reset. The index keys each layer scores follow the engine's
+published-key rule (the released behaviour; per row on a verify) and `V41_INDEX_OWNER=1`.
+
+**Drafts.** DSpark's stages stay on the CPU and read the host's window rings and the
+chain's means; a verify's rows go through the chain (its matrices on the per-row GEMV,
+so each row gets a decode step's bits), a rejection is the host's rollback and the
+watermarks follow.
+
+**A lost device.** The forward that failed runs again on the CPU from its input (the
+chain leaves it, and the host's state, untouched until every chunk is through), and the
+CPU runs from there. There is nothing to rebuild.
+
+**Declined** (the CPU runs the layers, the watermarks follow): `V41_TRACE`, prompts only
+when the forward has two rows or fewer, and a model the ops or the chain do not take: a
+head above 1024 floats, a window plus top-k above 3072 entries, an indexer above 64 heads
+or 4096 query floats, more than 8 streams, a compressed layer reading the index list of
+another ratio (or of none), a candidate mask read across ratios.
+
+**Arithmetic.** V4.1's CPU multiplies f32 activations everywhere, so the chain does the
+same arithmetic in another order. On the fixtures every configuration gives the CPU's
+tokens, and every logits row is within 1e-6 of the largest logit: 9.3e-7 at worst on
+Lavapipe, 1.1e-6 on a Radeon 780M (RADV) and 1.0e-6 on an Intel Iris Xe (Mesa's Dozen,
+four configurations).
+
+**The default**: `COLI_VK_CHAIN_UNMEASURED`, so the chain is off on an integrated GPU
+(`COLI_VK_CHAIN=1` turns it on, `2` for prompts only) and on a discrete GPU follows the
+rule above. No DeepSeek checkpoint was run on the chain: none is on the 780M box, and
+V4.1 Flash is 510 GB. Speed is not measured; the tests prove the tokens on the tiny
+fixtures, on Lavapipe, the 780M and the Iris Xe:
+
+```
+[VK] deepseek_v41: dense chain off (an integrated GPU with the expert tier: not measured; COLI_VK_CHAIN=0 off, 1 on, 2 prompts only)
+```
+
+### DeepSeek V4 on the chain
+
+`deepseek_v4_chain.h` runs DeepSeek V4's layers on the dense chain (`make deepseek-v4
+VK=1`, `COLI_VK_CHAIN=1`), every forward the engine makes: prompts, decode steps, the
+verify of a draft, the teacher-forced pass of `--record-oracle`, serve turns. What runs
+where, per layer:
+
+| | deepseek_v4 |
+|---|---|
+| device, frame A1 | the previous layer's FFN branch (the routed sum from the host plus the shared expert, to bf16) written back into the hc_mult streams; the attention site (hc_attn_fn, the split with Sinkhorn, the collapse with the site's own pre, bf16, the norm, bf16); the attention: the input to E4M3, wq_a, q_norm; on a compressed layer the compressor (wkv and wgate in bf16 on the f32 input, the ring with its position bias, the pooled rows' norm, RoPE at the group's first position with YaRN's table, the no-position part to E4M3 per 64); on a ratio-4 layer the indexer (its own compressor into the keys with the Hadamard transform and E2M1 per 32; the queries from the q latent, RoPE, Hadamard, E2M1; weights_proj; the scores and the top-k in score order); wq_b and the per-head RMS without weight, wkv and kv_norm, RoPE, the key's no-position part to E4M3 per 64, the new rows into the window ring; the sparse attention with the sink over the window and the compressed rows (V4's bf16 weights and output), the inverse RoPE, wo_a per group, wo_b; mHC's exit; the FFN site; every bf16 and E4M3 rounding where the CPU makes it |
+| host | the router (bf16, or the hash router on the token ids) and the routed experts: the expert tier's batch and the CPU's share, summed in the CPU block's order (ascending expert, then rank) |
+| device, frame A2 (not waited for) | the shared expert: the input to E4M3, w1 and w3, V4's SwiGLU between bf16 roundings, the input to E4M3, w2, bf16 |
+| after the last layer | the streams back to the host, which runs the final collapse, the norm and the head as before (and DSpark's taps of the last three layers) |
+
+The matrices are the per-matrix path's device copies, found in the same map (fp8 as
+fmt 12, bf16 as fmt 11), and the mHC mixes in f32 (fmt 10), which only the chain
+multiplies. Every matrix takes the per-row GEMV, never the tiled GEMM: a row's bits then
+do not depend on how a forward is cut into chunks, nor on whether the row is a prompt
+row, a decode step or a verify row, which is what the CPU gives (its batched and
+per-token kernels agree bit for bit), and what makes a reused prefix give the bits of a
+cold prefill. A prompt's matrices are slower for it than they could be.
+
+Four roundings are ops of their own, `vkc_dsv4_round` (bf16 over segments; E4M3 per
+block, the scale the smallest power of two that brings the block's maximum under 448;
+E2M1 per block, the scale the smallest that brings it under 6; the Hadamard transform
+with its bf16), each the engine's C bit for bit, and `vkc_dsv4_swiglu`. The indexer's
+scores past 4096 query floats (V4's 64 heads of 128) read the queries from memory instead
+of staging them, the same sums.
+
+**The state.** The host's stays canonical. What a forward changes there (the window ring,
+the compressed rows and their count, each compressor's ring, the indexer's keys and count
+and its compressor's ring) is written back once the forward's last frame is through, as
+the CPU would have left it. The device mirrors it: the window ring (window + chunk rows)
+behind a watermark, with the position each row holds, so a row a rejected draft longer
+than a chunk overwrote goes up again; the compressed rows and the index keys of each layer
+behind watermarks of their own; each compressor's ring behind a flag. Every host write
+lowers them: a CPU forward, a restored snapshot (a rejected draft), a reset, a prefix
+checkpoint or a pin restored, another attention state, a forward that does not start
+where the last one ended.
+
+**Drafts.** n-gram drafts (`V4_DRAFT`) verify through the chain and replay the accepted
+rows through it after a rejection. The full DSpark drafter (three MTP stages) stays on the
+CPU, reading the taps of the target's last three layers that the chain copies back; the
+tiny fixture has one MTP layer, so that path ran target-only in every test here.
+
+**A lost device.** The forward that failed runs again on the CPU from its input (the chain
+leaves the host's state and the caller's rows untouched until the last frame), and the CPU
+runs from there: nothing to rebuild.
+
+**Declined** (the CPU path runs, the device's copies follow): no resident dense layers (a
+low-memory plan reloads them per forward, and the `--oracle` path's own copies), the CUDA
+tier, prompts only (`COLI_VK_CHAIN=2`) for forwards of two rows or fewer, a forward whose
+attention list (the window plus every compressed row of a layer without an indexer) would
+pass 3072 entries (from there on in that session), and geometries past the shaders (head
+dim above 1024, an indexer head that is not a power of two or above 4096, a top-k above
+4096, more than 8 streams).
+
+**Arithmetic.** The device sums in other orders than the CPU (the GEMV, the norms' and
+mHC's reductions) and its exp and sqrt are not glibc's, so an intermediate value now and
+then lands on the other side of a bf16 rounding. V4 then amplifies it: the next E4M3
+rounding of a block that holds that value can move a whole step (one part in 8 to 16),
+and the indexer's top-k can pick another compressed row. Measured on Lavapipe: given the
+same input, a layer on the chain gives the CPU's output bit for bit apart from such
+single-value flips (checked by feeding the CPU the chain's layer output); on the fixtures
+51 to 100% of the logits rows are bit-identical to the CPU's, and the worst row moves by
+up to 0.32 of its largest logit (the 2-output-group fixture's 72-token case, after one
+flipped norm value at layer 0 moved a key row by an E4M3 step); in one of 1,500
+teacher-forced positions the argmax moved, never in a generated stream. So the gates
+are: the CPU's generated tokens exactly (and the reference's), every logits row within
+0.5 of its largest |logit|, and two checks no driver can blur: the chain against itself
+(chunks of 1, 2, 3 or the default, prefill chunks of 3, the tier off, drafts rejected and
+accepted give the same bits) and each decode row equal to the teacher-forced row at its
+position. A stale row in the device's ring after a rejected draft (a bug found while
+writing this) moved the logits by 0.39 to 0.53 of the largest, inside what a
+rounding flip can do, and failed the self-consistency check at once.
+
+**The default.** `COLI_VK_CHAIN_UNMEASURED`: off on an integrated GPU (`COLI_VK_CHAIN=1`
+turns it on, `2` for prompts only), on a discrete GPU the rule above. No DeepSeek V4
+checkpoint was run (the 780M box has none; the model is far past its disk), so speed is
+not measured; the tests prove the tokens on the tiny fixtures.
+
+```
+[VK] deepseek_v4: dense chain off (an integrated GPU with the expert tier: not measured; COLI_VK_CHAIN=0 off, 1 on, 2 prompts only)
+```
+
+### Kimi K3 on the chain
+
+`kimi_k3_chain.h` (kimi_k3) follows the recipe below with the
+[MLA ops](#multi-head-latent-attention-on-the-chain-vkc_mla), GLM-5.3's KDA ops and three
+of its own. Kimi K3's residual is AttnRes: per row a running prefix and a snapshot every
+`attn_res_block_size` layers, mixed by a softmax before the attention and before the MLP
+of every layer and once at the end. What runs where, per layer:
+
+| | kimi_k3 |
+|---|---|
+| device, frame A1 | the previous layer's MoE output joining the prefix (the routed sum's RMSNorm and latent up-projection, plus the shared experts, then the add: `moe_forward`'s order); the attention site's residual mix and a block boundary's snapshot; the input RMSNorm; a KDA layer (q, k, v, the full-rank output gate, the decay's two f32 matrices and beta's; the short convolution with its window, the delta rule with its state, the output norm and gate, o_proj) or a gated MLA layer (q_a, its norm, q_b, kv_a, the latent norm, the new rows into the cache; the absorbed core over the cache, the values times the sigmoid gate, o_proj); the prefix update; the MLP site's residual mix and post-attention norm; a dense layer's SiTU-GLU MLP and its add (no host step), or the f32 router's logits and the latent down-projection |
+| host | the router (sigmoid, the top-k with the correction bias, `K3_TOPP`) and the routed experts in the latent: the tier's batch and the CPU's share, added in the union's order; the new MLA rows copied into the host's cache |
+| device, frame A2 (not waited for) | the shared experts (SiTU-GLU at full width) |
+| after the last layer | the output residual mix and the final RMSNorm of every row, lm_head on the last; the normalized rows come back when the host wants the logits of every row (`K3_LOGITS`, `K3_VAL_LOGITS`, a logprobs request) and the host runs lm_head on them |
+
+Kimi K3's MLA is NoPE: the qk_rope parts of the query and of the shared key are used as
+the projections leave them. `vkc_mla_qkv` rotates them by angle 0 (a table of cos 1 and
+sin 0), which in float is the identity.
+
+| Op | Shader | What it does |
+|---|---|---|
+| `vkc_ares_mix` | `chain_ares` (mode 0) | `res_mix`: per row, the softmax of `(v . w) / sqrt(mean(v^2) + eps)` over the block snapshots and the prefix, and their weighted sum, in snapshot order (up to 15 snapshots) |
+| `vkc_situ` | `chain_ares` (mode 1) | SiTU-GLU, `b1*tanh(g/b1)*sigmoid(g)*b2*tanh(u/b2)`, in the CPU's order |
+| `vkc_kda_rec_flags` | `chain_kda` | the KDA recurrence with Kimi K3's two differences from GLM-5.3: the decay's `exp(A_log)` given as the engine keeps it (`VKC_KDA_EXP_A`), and `kda_forward`'s order of the l2 norms (the eps after the squares, q normalized, then scaled) and of the update, `k * ((v - mem) * beta)` (`VKC_KDA_K3`). `vkc_kda_rec` is the same op with no flags, unchanged for glm53 |
+
+`make vk-chain-check VK=1` runs Kimi K3's KDA layer against `kda_forward`'s arithmetic
+over two submissions (the state and the window carried, inputs small enough that the
+l2 eps counts), `res_mix` over 0 to 15 snapshots at row strides (D up to 7168) and
+SiTU-GLU at Kimi K3's constants. The KDA layer within 3.8e-7 of its largest output on
+Lavapipe, 5.0e-7 on the Radeon 780M and 5.4e-7 on the Iris Xe (Dozen); the residual mix
+within 2.4e-7, 3.3e-7 and 3.3e-7; SiTU-GLU within the test's 1e-6 on all three.
+
+**The state.** The MLA caches (`Lc`, the normalized latent, and `Rc`, the qk_rope part)
+stay the host's: each step copies its new rows back, and the device mirror has a
+watermark per layer that a CPU forward, a reset and a grown cache (`kv_alloc`) lower.
+The KDA state and the three convolution windows of every KDA layer stay on the device
+while the chain runs (96 heads of 128 x 128 floats and three windows of 12288 x 4: 6.9
+MB a layer on the full model): the host's copy is brought back before a recurrent-state
+checkpoint (`COLI_K3_CKPT`, a `pin=1` photo) or a CPU forward reads it, and goes up
+after a reset (a fill with zeros on the device) or a restored photo. Prefix reuse needs
+nothing more: the reused positions are rows below the watermark and a KDA state that
+already sits where the next step expects it.
+
+**Drafts.** kimi_k3 has no MTP head and no draft path.
+
+**A lost device.** The forward that failed runs again on the CPU from its input rows
+(the chain never writes them). If the device held the newest KDA state, that state is
+rebuilt on the CPU first: from the host's copy, current at the position where it last
+went up or came back, through the prefix record's ids up to where the device was, a
+prefill's worth of CPU work; from zeros if the loss interrupted a copy of the state to
+the host after part of it had landed. The CPU runs from there. (Both rebuilds were
+checked on the 780M, where that copy takes frames, by faults placed inside it: a serve
+session with checkpoints gave the CPU's frames either way.)
+
+**Declined** (the CPU path runs, the state synced first): the CUDA expert tier,
+`KIMI_DSA_INDEXER=1` (its index cache is filled on the CPU), the validation dumps that
+read every layer on the host (`K3_TRACE`, `K3_VALIDATE_LAYER`, `K3_DEBUG_OUT`), a model
+without its head (`K3_LAYERS`), a Segment's layer range, and geometries past the ops'
+limits (a KDA head above 128 floats, a convolution above 8 taps, `kv_lora` above 1024,
+`qk_rope` above 128 or odd). The chain's tensors are its own except the shared experts'
+under `COLI_VK_DENSE`, which it shares with the per-matrix path: a forward the chain
+declines (`COLI_VK_CHAIN=2`'s decode) runs on the CPU as before.
+
+**Arithmetic.** f32 activations, as the CPU's dense kernels (int8 rows and int4-g64
+alike); the routed experts are the tier's or the CPU's, as without the chain. The tiny
+fixture amplifies rounding at a few positions: the CPU against itself, with only its
+RMSNorm's sum taken in float instead of double, moves the logits by up to 1.4e-4 of the
+largest one on the f32 trunk and 1.0e-3 on the 8-bit one, and the served logprobs by up
+to 4.1e-3, at the positions where the chain moves them most (Lavapipe: 1.8e-4, 4.5e-4
+and 6.1e-3; the 780M: 2.3e-4, 9.9e-4 and 3.3e-3). The tests hold every logits row within
+2e-3 of the largest and the logprobs within 2e-2; the tokens are the CPU's in every
+configuration. With the CPU's int8 expert activations (`K3_IDOT=1`, tier off) a flipped
+int8 step moved the logits by 8.3e-3 on Lavapipe (no step flipped on the 780M), the
+tokens unchanged; that configuration is gated on its tokens.
+
+**The default**: kimi_k3 passes `COLI_VK_CHAIN_UNMEASURED`: off on an integrated GPU
+(`COLI_VK_CHAIN=1` turns it on, `2` for prompts only), on a discrete GPU the rule above.
+No Kimi K3 checkpoint was run (1.56 TB; the 780M box has none): speed is not measured,
+and the tests prove the tokens on the tiny fixture, on Lavapipe and on the 780M:
+
+```
+[VK] kimi_k3: dense chain off (an integrated GPU with the expert tier: not measured; COLI_VK_CHAIN=0 off, 1 on, 2 prompts only)
+```
+
 ### Adding an engine to the chain
 
 The recipe qwen36_chain.h and qwen38_chain.h follow, for the engines still on the
@@ -1106,9 +1332,9 @@ What each remaining architecture needs on top of today's shaders:
 
 | Engine | Attention / mixer | New pieces |
 |---|---|---|
-| deepseek_v41, kimi_k3 (MLA layers) | MLA: q_a/kv_a, the latent norms, q_b, RoPE on the rope dims, a latent + rope cache | the [MLA ops](#multi-head-latent-attention-on-the-chain-vkc_mla) take any geometry (q_lora or none, NoPE, the scale and cos/sin table from the engine, a gate on the values for Kimi K3); colibri and glm53 run them ([above](#glm-52-and-glm-53-flash-on-the-chain)). DeepSeek V4.1's attention has sinks and its own sparse selection: those are not in the ops yet |
-| deepseek_v4 | MLA with compressed (CSA) and hierarchical (HCA) KV, mHC | the manifold hyper-connections are `vkc_mhc` (GLM-5.3's, the same arithmetic) and the clamped SwiGLU too; the compressors' rolling windows are rings like the conv's, snapshotted the same way; the CPU rounds activations to E4M3 before its fp8 matmuls, so the chain needs that rounding as an element-wise op to keep the same arithmetic |
-| kimi_k3 (KDA layers) | Kimi Delta Attention: a gated delta rule whose decay is a vector over the key channels | `vkc_kda_conv` and `vkc_kda_rec` (GLM-5.3's KDA, `delta_attention.h`'s step); Kimi K3 builds its decay and output gate its own way (a full g_proj, not a low-rank one), which the recurrence's prologue and epilogue would take as options |
+| deepseek_v41 | MQA over a window ring and compressed rows, a sink, an indexer with candidate blocks | on the chain ([above](#deepseek-v41-flash-and-deepseek-v4-on-the-chain)), with the [DeepSeek ops](#deepseek-v41-flash-and-deepseek-v4s-attention-vkc_dsv4) |
+| deepseek_v4 | MQA over a window ring and compressed (CSA, HCA) rows, mHC, bf16 and E4M3 roundings | on the chain ([above](#deepseek-v4-on-the-chain)), with the DeepSeek ops and their rounding modes |
+| kimi_k3 (KDA layers) | Kimi Delta Attention: a gated delta rule whose decay is a vector over the key channels | on the chain ([above](#kimi-k3-on-the-chain)): `vkc_kda_conv` and `vkc_kda_rec_flags` with Kimi K3's options; its full-rank output gate and low-rank decay are matmuls before the op |
 | mimo | sliding-window attention (and full layers) | done: [MiMo-V2.6 on the chain](#mimo-v26-on-the-chain) (`chain_attn.comp` with a window, a ring of W rows, V's own head dim and a sink) |
 | inkling | grouped attention with a relative-position bias, a sliding window and short convolutions; MoE with shared experts | in the chain ([OLMoE and Inkling](#olmoe-and-inkling)): two shaders of its own, `chain_relattn.comp` and `chain_sconv.comp`; the shared experts join through `HC_APPLY` |
 | olmoe | attention with q/k norm, MoE without a shared expert | in the chain ([OLMoE and Inkling](#olmoe-and-inkling)) with qwen36's ops as they are |
@@ -1162,6 +1388,32 @@ way, the KDA layer against `delta_attention.h` over two submissions (the state a
 window carried between them, inputs small enough that the l2 eps counts), the mHC ops
 against `hyper_connections.h`; each within 3e-7 on Lavapipe and on the Iris Xe.
 
+### DeepSeek V4.1 Flash and DeepSeek V4's attention (`vkc_dsv4`)
+
+DeepSeek's attention is not the absorbed MLA above: it is MQA over one KV row per
+position, the same row key and value, read from a sliding window of raw rows and from
+compressed rows (a compressor pools `ratio` positions into one) that a DSA indexer picks
+per query, with an attention sink. Its ops are in `vk_chain.h` (`vkc_dsv4_*`), one shader
+of their own (`chain_dsv4.comp`), optional like the MLA ones:
+
+| Op | What it does |
+|---|---|
+| `vkc_dsv4_attn` | the sparse attention of `sparse_attn.h`: per row a list of window rows, compressed rows and skipped entries; the sink in the denominator only, the value sum and the denominator in list order; optionally DeepSeek V4's roundings (the weights and the output to bf16) |
+| `vkc_dsv4_rope` | RoPE on interleaved pairs in place from a host table, forward or inverse (the attention output's un-rotation) |
+| `vkc_dsv4_compress` | the compressor's rolling group: each row's kv and score rows into the ring slot of its position, the per-channel softmax pooling when a group completes; DeepSeek V4's overlapping form (two halves, a position bias per slot) too |
+| `vkc_dsv4_score` | the indexer's scores: the relu-gated, head-weighted dot of each reachable compressed row, a candidate mask, -inf past the row's reach |
+| `vkc_dsv4_cand` | DeepSeek V4.1's candidate blocks: each block's best score, the newest block pinned, the best blocks kept whole |
+| `vkc_dsv4_topk` | the top-k of the CPU's selection (ties to the lower column), in column order (V4.1) or by rank (V4), padded with skipped entries |
+| `vkc_dsv4_engram` | DeepSeek V4.1's engram gate on the residual streams |
+
+`make vk-chain-check VK=1` checks them against references transcribed from
+`deepseek_v41.c` (and V4's rounding variant): the attention over lists of window and
+compressed rows with skipped entries and a row with none (within 1.1e-6 of the largest
+output on Lavapipe), RoPE both ways, the compressor over three calls with its ring
+carried (ratios 1 to 4, the overlapping form with its bias, within 2e-6), the scores,
+the candidate mask and the top-k list slot for slot on scores exact in float on both
+sides, ties included, with and without a mask, and the engram gate (within 2e-6).
+
 ## Adding an engine to the tier
 
 Every MoE engine here is on the tier ([the table above](#the-routed-expert-tier-vk_tierc));
@@ -1193,6 +1445,142 @@ in short:
    forward's start for a model whose layer index never goes back (a single MoE layer).
 4. **Report**: `vkt_report("run"|"turn", ram_hits, disk_loads)` beside the engine's
    `[VK]` line; `vkt_resident(l, e)` gives EMAP its tier 2.
+
+## Memory placement without Resizable BAR
+
+Resident data (the dense weights, the routed-expert tier, the MLA KV mirror) is written
+by the host once and read by the device for the rest of the run. The mapped path puts it
+in the HOST_VISIBLE|DEVICE_LOCAL memory type and writes it through a mapping. On an
+integrated GPU, a CPU device (Lavapipe) or a discrete card with Resizable BAR, that type
+covers the device's memory. A discrete card without Resizable BAR (every Turing card,
+every Ampere card on its launch VBIOS, older AMD cards with the option off) exposes it
+as a window of about 256 MB of 8 GB or more. NVIDIA's driver refuses allocations past the
+window: on an RTX 3070 with its launch VBIOS the backend warned "only 246 of 8192 MB VRAM
+is host-visible", placed no matrix, every tier upload failed and the chain stopped at its
+first matrix. RADV places them in system RAM instead, where every access crosses PCIe.
+
+**Staged uploads** put resident data in a DEVICE_LOCAL memory type the host does not map
+and copy it there from a host staging buffer with `vkCmdCopyBuffer`.
+
+**The rule** (`place_decide` in `backend_vulkan.c`). `COLI_VK_STAGED=1` stages,
+`COLI_VK_STAGED=0` keeps the mapped path. Unset: staged when the host-visible
+device-local heap holds less than a quarter of the largest device-local heap, or there is
+no host-visible device-local type at all. That is a card without Resizable BAR (256 MB of
+8 GB) and never a card with it, an integrated GPU or Lavapipe, whose host-visible heap is
+the whole device-local heap. `COLI_VK_HOST_VISIBLE_CAP_MB=N` treats the host-visible heap
+as at most N MiB, so a device with Resizable BAR or unified memory takes the decision a
+card without it would (the tests use 246). The device-local target is a type that is not
+host-visible on the largest device-local heap (else that heap's device-local type:
+Lavapipe has one type for everything); the staging type is host-visible and coherent and
+not device-local where one exists, so staging never takes the window. Vendor types
+(AMD's uncached and device-coherent ones) are passed over.
+
+**What moves where, staged:**
+
+| Data | Mapped path | Staged |
+|---|---|---|
+| Dense resident tensors (`coli_vk_tensor_ensure`, `coli_vk_matmul`'s first call) | weight pool, host-visible | weight pool in device-local blocks; rows and scales streamed through two 16 MiB staging slots, the upload complete when the call returns |
+| The routed-expert tier's pool (`vk_tier.c`) | tier pool, host-visible, filled in place by the uploader thread | device-local; the uploader fills a host image (`coli_vk_tier_tensor`) and `coli_vk_tensor_commit` copies it, all three matrices of an expert in one submission |
+| `COLI_VK_DEV2`'s experts | its pool, host-visible | its pool in its device-local memory, by the same rule on that device |
+| MLA KV mirror and q-prep norm weights (`COLI_VK_ATTN`) | host-visible, written per row | device-local; each row is a pending copy recorded at the head of the next absorb or q-prep command buffer, their only readers |
+| The dense chain: state, KV caches, parameters (`VKC_DEV`) | device-local already, written through the frame's staging | unchanged |
+| The chain's host-written buffers (`VKC_UP`: frame staging, the rows each layer step uploads) | the host-visible device-local type | host staging memory, out of the window |
+| Readbacks (`VKC_DOWN`, `y` scratches) | host-visible, cached | unchanged |
+| Per-call input scratches, device-only scratches | unchanged | unchanged (a few MB, they fit the window) |
+
+**Synchronization.** One uploader per device, its own command pool, two command buffers
+and two fences (a slot is filled while the other copies), one upload at a time under its
+mutex. Its queue: a transfer-only family (a copy engine) when the device has one, else a
+spare queue of a family the backend already uses (the 780M's second compute queue, a third
+queue of the Iris Xe's main family), else the main queue (Lavapipe has one queue), in
+which case every submit of the backend and of the chain takes the same lock
+(`vk_submit`, `coli_vk_queue_submit`). An upload waits for its fences before it returns,
+so a tensor is complete before any queue reads it: the tier's uploader thread hands an
+expert to the engine thread only after its commit returned. When the uploader's family
+differs from the main or the tier queue's, the staged tensors' buffers are created
+`VK_SHARING_MODE_CONCURRENT` over those families. The KV mirror's pending copies ride the
+main queue in the same command buffer as their reader; a row written again before that
+(a rewound cache) first sends what is pending, so no two pending copies overlap.
+
+**When an upload fails.** A staging buffer that cannot be had at startup leaves the
+mapped path on (with a line saying so). A device-local block or buffer the driver refuses
+is out of memory: that matrix stays on the CPU, the tier takes fewer experts, the KV
+mirror's layer runs its attention on the CPU. A command buffer that would not record or a
+submit refused fails that upload only: the uploader waits for what it had sent, frees the
+tensors and starts the next upload clean; the matrix stays on the CPU, and an expert whose
+commit failed stays on the CPU with the tier's budget intact (it may be promoted again). A
+fence wait that fails means the copy may still run: the device is taken as lost, as for
+every other wait, so the dense matrices, the tier (its batches stop) and the chain (at its
+next frame, rebuilding the state on the CPU) all move to the CPU. `COLI_VK_STAGED_FAULT`
+injects each of these, and `tests/vulkan_engines.sh staged-faults` (with
+`staged-faults-sanitize` under ASan and UBSan) runs qwen36's matrices, its tier awaited and
+with the uploader thread free, its chain, and colibri's KV mirror through every point,
+gated on the CPU's tokens.
+
+**A fresh device-local block is zero-filled** (`vkCmdFillBuffer`) before its first
+tensor. On an RX 580 (RADV, Polaris) the author of #1338, where this approach comes from,
+measured results that differed slightly from run to run when read from a block the GPU had
+never touched, and identical ones after a fill of any value. Skipping the fill
+(`COLI_VK_TEST_NOFILL=1` in the harness) changed nothing on Lavapipe, the Iris Xe or the
+780M: the harness's digest of every result was the same with and without it. It costs one
+fill per 256 MB block and stays.
+
+**Lines it prints.** At startup, staged only:
+
+```
+[VK] memory: staged uploads, resident data in device-local memory (type 0, 21466 MiB heap) copied from host staging memory (type 2) on a queue of its own (246 of 21466 MiB of device-local memory is host-visible (COLI_VK_HOST_VISIBLE_CAP_MB))
+```
+
+and at exit, where the data ended up (the tests read the last field; qwen36's tiny
+fixture with the chain on the 780M, `COLI_VK_STAGED=1`):
+
+```
+[VK] memory at exit: weights 0.8 MiB, expert tier 0.4 MiB (peaks), KV mirror 0.0 MiB in device-local memory type 0 (not host-visible); the dense chain's state in type 0 (device-local); 1.2 MiB staged in 530 copies, 2 blocks zero-filled; resident data in host memory: 0.0 MiB
+```
+
+With `COLI_VK_STAGED=0` on a small-window card, the old warnings stay.
+
+**Tested.** None of our devices lacks Resizable BAR, so the path is forced
+(`COLI_VK_STAGED=1`) or the decision emulated (`COLI_VK_HOST_VISIBLE_CAP_MB=246`):
+
+- the `VK_TEST` harness prints a digest of every result the device returns (every
+  format, the tiled GEMMs, the expert batch, and in the full run the gate_up, the expert
+  group, the absorb core, the q-prep chain and a rewound KV mirror): mapped, staged,
+  staged without the zero fill and under the emulated window, the digest is the same on
+  Lavapipe, the Iris Xe through Dozen and the Radeon 780M, and for the format and
+  expert-batch cases the same as the backend's before this change;
+- `tests/vulkan_engines.sh staged`: that comparison, then the tier (`test_vk_tier`) and
+  the chain's ops (`test_vk_chain`) staged, each ending with no resident data in host
+  memory; `<family>-staged` runs a family with `COLI_VK_STAGED=1`, and `qwen-staged`
+  first runs qwen36's tier and chain under the emulated window with the decision left to
+  the backend (CI: the staged family and the shader family staged in the Vulkan job,
+  `qwen-staged` and `qwen-chain-staged` in the engines matrix);
+- on the 780M, qwen36's tiny fixture with the tier and the trunk on the device, and with
+  the chain: the CPU's tokens, and logits bit for bit the mapped run's, staged and under
+  the emulated window.
+
+**Measured on the 780M**, where staging is not needed (unified memory: the default stays
+mapped), to see what it costs: Qwen3.6-35B-A3B, the method of [the tier's
+measurements](#measured-on-a-radeon-780m) (int4 gs64 at cap 64, `OMP_NUM_THREADS=8`, the
+model files evicted from the page cache before each run, 1-min load under 2, every arm
+from the same history), the same binary, `COLI_VK_STAGED=0` against `1`. Decode is 100
+tokens after a 25-token prompt (in brackets the whole process, the warm start's 11 GiB of
+staged experts included), prefill a 512-token prompt (time to the first token):
+
+| | mapped | staged |
+|---|---|---|
+| decode, tier (trunk on the CPU) | 7.94 tok/s (22.96 s) | 7.96 tok/s (22.60 s) |
+| decode, tier and chain (`COLI_VK_CHAIN=1`) | 9.91 tok/s (20.16 s) | 9.96 tok/s (20.09 s) |
+| prefill, tier | 12.26, 12.22 s | 12.29, 12.15 s |
+| prefill, tier and chain | 9.53 s | 9.43 s |
+
+The same within what one run to the next varies on this box, and each pair printed the
+same text. On
+unified memory a device-local copy is a RAM copy and the mapped path reads the same RAM,
+so this says only that staging costs nothing here. **Not measured: a discrete card without
+Resizable BAR**, the case staging is for (none is available); there the copies cross PCIe
+once per upload and the device then reads VRAM instead of the window or system RAM. The
+contributor who reported the RTX 3070 offered to run it.
 
 ## Correctness
 
@@ -1258,6 +1646,12 @@ in short:
   and swiglu_limit 0, a device lost (glm53's KDA state rebuilt), serve sessions with pins
   and two KV slots, and glm53's pin-branch harness; `glm-chain-sanitize` runs them under
   ASan and UBSan.
+  `kimi-chain` does it for Kimi K3: Moonshot's
+  oracle with the chain on, every dense format, prefill a token at a time and in chunks,
+  the tier's eviction, prompts only, a device lost in a prompt, inside a chunked forward
+  and mid-decode (the KDA state rebuilt), serve sessions with prefix reuse and
+  recurrent-state checkpoints in RAM and on disk; `kimi-chain-sanitize` under ASan and
+  UBSan.
 - int4 weights decode as offset-binary (nibble−8), byte-identical layout to
   the CPU path — no repacking.
 - Khronos validation layers: the backend never enables them, so the loader
@@ -1312,9 +1706,10 @@ hit-rate line is the tier-effectiveness number.
   except with the dense chain (`COLI_VK_CHAIN=1`), which runs the whole layer, prefill
   and the DSA selection included. Its routed experts are on the shared expert tier,
   which serves prefill too.
-- The expert tier's uploads are host writes into host-visible device memory: a
-  discrete card needs Resizable BAR for them (above). A staging copy on a transfer
-  queue, for cards without it, is not written.
+- On a discrete card without Resizable BAR, resident data (the dense weights, the
+  expert tier, the KV mirror) goes through staged uploads
+  ([above](#memory-placement-without-resizable-bar)); that path is tested by forcing
+  it and by emulating the small window, and not yet measured on such a card.
 - Without the dense chain, DSA top-k selection, ragged multi-slot serving, and
   quantized-KV caches fall back to the CPU attention path; with it, the DSA selection
   runs on the device.

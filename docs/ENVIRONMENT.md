@@ -228,6 +228,9 @@ Per-drive byte counts are reported in a `MIRROR:` stats line. Combine with `DIRE
 | `COLI_VK_COOP_SG` | `64` where allowed | Subgroup size the cooperative-matrix pipeline requires (RDNA3: wave64 measured fastest). Tuning only. |
 | `COLI_VK_GEMM_TILE` | measured | `bm,bn,bk,tm,tn[,pf]`: one tile for every width of the fp32 GEMM instead of the measured pair. Tuning only (`COLI_VK_TEST_GEMM_BENCH`). |
 | `COLI_VK_COOP_TILE` | measured | `bm,bn,wm,wn,bk`: one tile for every width of the cooperative-matrix GEMM. Tuning only. |
+| `COLI_VK_STAGED` | auto | Staged uploads: resident data (the weights, the expert tier, the MLA KV mirror, `COLI_VK_DEV2`'s experts) copied into device-local memory the host does not map, through a host staging buffer, instead of written through a mapping of the host-visible device-local memory. `1` on, `0` off. Unset: on when the host-visible device-local heap is under a quarter of the largest device-local heap, as on a discrete card without Resizable BAR (about 256 MB of 8 GB, where the mapped path fails or spills to system RAM); off on a card with Resizable BAR, an integrated GPU or Lavapipe. See [vulkan.md](vulkan.md#memory-placement-without-resizable-bar). |
+| `COLI_VK_STAGED_FAULT` | unset | Tests: `<point>[:n]` makes the n-th staged upload (the first by default) fail at `stage` (the staging buffer), `pwstage` (the KV mirror's), `block` (a device-local block), `kvbuf` (a KV mirror or norm-weight buffer), `record` (a command buffer's begin or end), `submit`, `wait` (a fence wait: the device is then lost) or `commit` (a tier expert's commit after its first matrix); a `[VK] COLI_VK_STAGED_FAULT` line says when it fired. |
+| `COLI_VK_HOST_VISIBLE_CAP_MB` | unset | Tests: treat the host-visible device-local heap as at most this many MiB in the `COLI_VK_STAGED` decision, so a device with Resizable BAR or unified memory takes the decision a card without it would (`246` emulates an RTX 3070 on its launch VBIOS). |
 
 ### The routed-expert tier (`vk_tier.c`, every MoE engine)
 
@@ -245,13 +248,13 @@ With `COLI_VULKAN=1` every MoE engine (qwen36, qwen38, inkling, olmoe, kimi_k3, 
 | `COLI_VK_TIER_GEMM_ROWS` | `16` | Rows from which an expert of a step takes the tiled GEMM (prefill) instead of the per-row GEMV; `0` never. Below it a row's bits do not depend on how many rows share the dispatch. |
 | `COLI_VK_TIER_QUEUE` | a second queue | `0`: the tier's batches share the main queue with the dense matmuls (they then serialize). Unset: a second queue of the main family, else a compute-only family's (RADV), else shared (Lavapipe). |
 | `COLI_VK_DENSE` | on; off on a device sharing the CPU's RAM while the tier is on | Where the dense (non-expert) matrices of qwen36, qwen38, inkling, olmoe, kimi_k3 (its shared experts), mimo, deepseek_v41, deepseek_v4, glm53 and qwenimage run. `0`: on the CPU (with the tier on, the device takes the routed experts only); `1`: on the device whatever the device. Unset: on the device, except on an integrated GPU or a CPU device (Lavapipe) while the engine runs the expert tier (every one of them but qwenimage, which has no routed experts), where they stay on the CPU: there the dense matmuls cost more than the tier gains (measured on a Radeon 780M). The `[VK] <engine>: device ready, dense matrices on the ...` line says which and why. The GLM engine reads it through the same rule with its own default, off (see above). |
-| `COLI_VK_CHAIN` | on for a discrete GPU; qwen36 and olmoe on, qwen38 off, and mimo, inkling, colibri and glm53 off (not measured) on an integrated GPU with the tier; off on a CPU device | qwen36, qwen38, olmoe, inkling, mimo, colibri (GLM-5.2) and glm53 (GLM-5.3 Flash): every layer's dense chain recorded into one submission per layer, the residual stream and the recurrent and KV state on the device (see [vulkan.md](vulkan.md#the-dense-chain-vk_chainc)). `0` off, `1` on, `2` on for prompts only (decode on the CPU). The `[VK] <engine>: dense chain ...` line says which and why. |
+| `COLI_VK_CHAIN` | on for a discrete GPU; qwen36 and olmoe on, qwen38 off, and mimo, inkling, colibri, glm53, kimi_k3, deepseek_v41 and deepseek_v4 off (not measured) on an integrated GPU with the tier; off on a CPU device | qwen36, qwen38, olmoe, inkling, mimo, colibri (GLM-5.2), glm53 (GLM-5.3 Flash), kimi_k3, deepseek_v41 (DeepSeek V4.1 Flash) and deepseek_v4: every layer's dense chain recorded into one submission per layer, the residual stream and the recurrent and KV state on the device (see [vulkan.md](vulkan.md#the-dense-chain-vk_chainc)). `0` off, `1` on, `2` on for prompts only (decode on the CPU). The `[VK] <engine>: dense chain ...` line says which and why. |
 | `COLI_VK_CHAIN_ROWS` | `512` | Prompt rows per chunk of the chain's prefill. |
 | `COLI_VK_CHAIN_GEMV` | on | `0`: the chain's decode matrices take `qmatmul.comp`'s GEMV instead of `chain_gemv.comp`'s. |
 | `COLI_VK_CHAIN_SPIN_US` | `2000` | How long a wait on a chain frame polls before blocking. |
 | `COLI_VK_CHAIN_PROF` | off | `1`: device time per kind of chain op, one line per run. |
-| `COLI_VK_CHAIN_FAULT` | off | Tests: the n-th chain frame fails as a lost device would; the engine rebuilds the state on the CPU and runs there (colibri and mimo have none to rebuild: the CPU continues from its host caches). |
-| `DUMP` | unset | colibri and glm53 in a `VK=1` build: every logits row the forward computes, appended to this file as raw f32 (the Vulkan gates compare the device's with the CPU's). |
+| `COLI_VK_CHAIN_FAULT` | off | Tests: the n-th chain frame fails as a lost device would; the engine rebuilds the state on the CPU and runs there (colibri, mimo and the DeepSeek engines have none to rebuild: the CPU continues from its host caches). |
+| `DUMP` | unset | colibri, glm53, deepseek_v41 and deepseek_v4 in a `VK=1` build: every logits row the forward computes, appended to this file as raw f32 (the Vulkan gates compare the device's with the CPU's). |
 
 ### Second Vulkan device (opt-in)
 
@@ -365,6 +368,7 @@ These are for testing, benchmarking, or internal use — not part of the everyda
 | `COLI_GPU_FAIL_AFTER` | unset | Fault injection: make GPU compute calls start failing after N of them, to exercise the CPU fallback without real hardware faults. Uploads and queries are not gated. |
 | `COLI_VK_TEST_BALLAST` | `0` | Allocate N extra dummy Vulkan buffers to reproduce decode attention degrading with expert-tier size even when VRAM is free (measured 7.9s @2.6k buffer objects → 15.6s @4.3k with 2.9 GB still free). |
 | `COLI_VK_TEST_GEMM_BENCH` | unset | In the `VK_TEST` harness, time the GEMV against the fp32 and the cooperative-matrix GEMM per weight format and S, in GFLOP/s, instead of running the cases. `COLI_VK_TEST_GEMM_FMT=a,b,...`, `COLI_VK_TEST_GEMM_S=a,b,...` and `COLI_VK_TEST_GEMM_SHAPE=I,O` (default `2560,6144`) narrow it. |
+| `COLI_VK_TEST_NOFILL` | unset | In the `VK_TEST` harness with staged uploads, skip the zero fill of a fresh device-local block (the run-to-run difference #1338 measured on Polaris without it). |
 | `COLI_VK_TEST_HOSTMEM` | unset | In the `VK_TEST` harness, time the expert batch reading Qwen3.8-shaped int4-g64 experts from the tier's device memory against host memory imported with `VK_EXT_external_memory_host` (no copy), and what a copy into the tier costs, instead of running the cases. |
 | `COLI_SERVE_ALL_STOPS` | unset | In batched serve mode, keep every stop token instead of filtering to the EOS-like ones. Trades the #401 tool-call safety for behaviour some non-tool clients prefer. |
 | `VK_PROF` | unset | If set, time the Vulkan expert-group path and report it, and print at exit how the resident matmuls split between the GEMV, the fp32 GEMM and the cooperative-matrix GEMM, with their wall time. |
@@ -457,15 +461,18 @@ and the CPU/GPU execution split.
 | `COLI_DENSE_I8` | `1` (on) | Quantize resident dense matrices to per-row int8 at startup. `=0` keeps the f32 reference path for quality A/Bs. |
 | `COLI_DENSE_IDOT` | `1` (on) | The dense trunk's GEMVs (DeltaNet projections and out_proj, attention q/k/v/o, shared expert, lm_head) quantize the activation to int8 once per call and run integer dot products (maddubs on AVX2, vpdpbusd on AVX-VNNI / AVX-512 VNNI) instead of converting every int8 weight to f32. Not bit-identical to the f32 path; measured +1.0% perplexity, lm_head 12.6 to 10.2 ms/token. `=0` restores the f32-activation kernel. |
 | `QWEN_EXPERT_ACT` | `i8` | The routed experts' activation quantized to int8 once per row (expert_ffn.h mode 1). Measured +0.1% perplexity, expert compute 22.7 to 15.9 ms/token. `=f32` restores f32 activations and the bit-identical contract with the pair kernels. |
-| `COLI_DENSE_BITS` | `8` | `=4` stores the dense trunk as int4 in blocks of 64 with one scale per block (the K1b planar layout, half the bytes), served by the grouped integer kernel; implies the integer dot. Opt-in: on the 35B it costs +10% perplexity on the whole trunk, +2.4% on lm_head alone (see `COLI_DENSE_INT4`). |
+| `COLI_DENSE_BITS` | `8` (a Clef checkpoint under the gateway: `16` when the planner's RAM budget holds it, docs/clef.md) | `=4` stores the dense trunk as int4 in blocks of 64 with one scale per block (the K1b planar layout, half the bytes), served by the grouped integer kernel; implies the integer dot. Opt-in: on the 35B it costs +10% perplexity on the whole trunk, +2.4% on lm_head alone (see `COLI_DENSE_INT4`). qwen36 `=16` keeps the container's f16 values, no quantization, twice int8's RAM: on Clef it moves a probability by 0.012 where int8 moves it by 0.22. |
 | `Q36_MAX_IMAGE_TOKENS` | the checkpoint's preprocessor ceiling | Gateway, qwen36 containers with a vision tower (Qwen3.8-27B): ceiling on the tokens one image costs. The image is shrunk, not cropped. Without one a 1080p photo is about 2000 tokens of tower and prefill on the CPU. |
 | `COLI_DENSE_KEEP_I8` | `0` (off) | qwen36: a matrix that got its int4 copy (`COLI_DENSE_BITS=4`) frees its int8 copy, which only the CUDA placer reads; `=1` keeps both. With `COLI_CUDA=1` both are kept anyway. Measured on Qwen3.8-27B: 42.4 GB resident with both copies, 18.8 GB without. |
 | `COLI_DENSE_INT4` | all components | With `COLI_DENSE_BITS=4`, a comma list of the components that take int4: `lmhead`, `dnproj`, `dnout`, `attn`, `shexp`, `router`. Measured on the 35B: `lmhead` +2.4% perplexity for 254 MB less per token; `lmhead,dnproj,dnout` +5.6%; everything +10%. |
 | `QWEN_EXPERT_KERNEL` | `1` (on) | Routed experts run through the shared `expert_ffn.h` kernel: the int4 stays packed in RAM (planar layout, half the expert-cache RSS of the int8 unpack), gate+up are one pass, and a layer is two OpenMP regions over (expert, row-chunk) items instead of 3 x top-k GEMV regions. Takes effect on an int4 gs=64 container whose hidden and expert widths are multiples of 64, and not under the CUDA expert tier. `=0` restores the unpack-to-int8 path; the two produce the same tokens (1024-token decode on the real container byte-identical; pinned on the tiny int4 fixture in CI), only the f32 accumulation order inside a dot differs. Measured at cap 256 on the real container: 12.8 -> 15.7 tok/s, peak RSS 29 -> 17 GB. |
 | `QWEN_DENSE_BATCH` | `1` (on) | On AVX2/FMA, reuse each dense-int8 weight decode across two prompt rows. `=0` restores one GEMV call per row. Decode `S=1` is unchanged. |
 | `QWEN_SHARED_BATCH` | bounded by 32 MiB scratch | Batch the CPU shared expert across prompt rows. `=0` restores scalar calls; a positive integer caps rows per chunk. The CUDA-tier overlap path is unchanged. |
-| `Q36_MAXT` | conservative engine default | Lower the served/context capacity; it cannot raise the model's compiled safety ceiling. |
+| `Q36_MAXT` | conservative engine default (16384 for a Clef checkpoint, its own `max_length`) | Lower the served/context capacity; it cannot raise the model's compiled safety ceiling. |
 | `COLI_VULKAN` | `0` | `VK=1` build: the dense trunk on the Vulkan device, and the routed experts on the shared expert tier (`COLI_VK_TIER*`, `COLI_VK_DENSE`, see [Vulkan](#vulkan-any-gpu-with-a-vulkan-12-driver)). With the tier on, the engine keeps the expert history `COLI_USAGE` (default `<snap>/.coli_usage`), saved at every run and serve turn end; it keeps none otherwise. |
+| `Q36_DN_GPU` | `0` (off) | CUDA expert tier: a decode token runs every DeltaNet layer whose in_proj and out_proj sit on one card end to end on that card (conv, recurrence, gated norm; state resident in VRAM). Measured on the 35B, 3070, trunk in VRAM: DeltaNet 16.2 -> 10.8 ms/token, the token 39.4 -> 33.3 ms. See [qwen36-cuda-tier.md](qwen36-cuda-tier.md#the-deltanet-layer-on-the-card-q36_dn_gpu1). |
+| `QT_HOME` | `expert` | CUDA expert tier on two or more cards: `layer` homes every expert of a layer on one card (layer ranges weighted by allowance / probed dense-GEMV time per card, `QT_LAYER_SPLIT=<n>` layers on the first card overrides), with the layer's trunk and, for the last layer, lm_head alongside -- a pipeline instead of a per-layer join. See [qwen36-cuda-tier.md](qwen36-cuda-tier.md#two-cards-as-a-pipeline-qt_homelayer). |
+| `Q36_OFFER_SHEXP` | `0` (off) | Offer the shared expert to the VRAM placer. Off by default: on the card it costs 6.3 ms/token (3070) to 11-12.7 ms (with a slower second card) against 3.7-4.0 on the CPU, where it hides behind the expert group. |
 
 ## Qwen3.8 engine (`qwen38`)
 
@@ -572,6 +579,23 @@ Read **only** by `c/olmoe.c`. This is the sister engine used for streaming-cache
 | `CONF_LIMIT` | `0.92` | Confidence ceiling for the router prediction. Clamped to [0.1, 1.0]. |
 | `EXPERT_DROP` | `0` (off) | Drop experts below the confidence threshold instead of loading them (quality/speed experiment). |
 | `COLI_VULKAN` | `0` | `VK=1` build: attention, router and lm_head on the Vulkan device, and the routed experts (int8 rows) on the shared expert tier (`COLI_VK_TIER*`, `COLI_VK_DENSE`, see [Vulkan](#vulkan-any-gpu-with-a-vulkan-12-driver)). The warm start reads the history `COLI_USAGE` names; without it the tier fills as experts pass by. |
+
+## Laya engine (`laya`)
+
+Read **only** by `c/laya.c`, the decision engine ([laya.md](laya.md)).
+
+| Variable | Default | Effect |
+|---|---|---|
+| `COLI_LAYA_MAX_LEN` | the checkpoint's `max_len` | Tokens per question sequence (512 on the English checkpoint, capped at the encoder's 8192 positions). |
+| `COLI_LAYA_HEAD_MAX_LEN` | the checkpoint's `head_max_len` | Tokens shared by a question's instructions and options; raise it for questions with many options. |
+
+## GLiNER2.5-Decide engine (`gliner_decide`)
+
+Read **only** by `c/gliner_decide.c`, the decision engine ([gliner_decide.md](gliner_decide.md)).
+
+| Variable | Default | Effect |
+|---|---|---|
+| `COLI_GLINER_MAX_LEN` | `4096` | Tokens of the one sequence a request becomes: every question with its options, then the state. The state is cut at the last whole word that fits; questions that alone exceed it are refused with a 422. |
 
 ---
 

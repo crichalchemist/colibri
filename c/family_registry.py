@@ -36,6 +36,10 @@ class FamilyCapabilities:
     # handshake line, openai_server.Engine.vision), never this bit's: a glm53
     # export can carry vision_config and no model.visual.* tensors.
     image: bool = False
+    # A decision engine: it answers POST /v1/systemone natively (the DECIDE
+    # command) and generates nothing. The engine confirms it at start-up with
+    # `CAPS decide=1 chat=0`, which is what the gateway routes on.
+    decision: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -155,15 +159,21 @@ class FamilyDescriptor:
     # la geometria lo rende visibile. 0 = nessun riferimento dichiarato, il
     # banner stampa display_scale come sempre.
     reference_experts: int = 0
-    # "text" for the chat engines, "image" for a text-to-image pipeline. An
-    # image family has no KV cache, no experts and no chat template: coli
-    # routes it to the image REPL, the image planner and POST
-    # /v1/images/generations, and every text-only invariant (context variable,
-    # segment conformance, tuning) is scoped to modality "text".
+    # "text" for the chat engines, "image" for a text-to-image pipeline,
+    # "decision" for a decision model. An image family has no KV cache, no
+    # experts and no chat template: coli routes it to the image REPL, the image
+    # planner and POST /v1/images/generations, and every text-only invariant
+    # (context variable, segment conformance, tuning) is scoped to modality
+    # "text". A decision family has none of them either: it is served by
+    # `coli serve` / `coli web` and answers POST /v1/systemone only.
     modality: str = "text"
     # Where the tokenizer lives, relative to the model directory. A diffusers
     # pipeline keeps it in processor/, not at the root.
     tokenizer_file: str = "tokenizer.json"
+    # The other files a decision checkpoint needs besides model.safetensors and
+    # the tokenizer, relative to the model directory: what `coli doctor`
+    # checks. Each decision family keeps its configuration in its own layout.
+    checkpoint_files: tuple = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -173,6 +183,62 @@ class ResolvedFamily:
     config: dict
     family_config: dict
     model_dir: str
+    # A decision head over a text family's backbone (Cloudflare's Clef: a qwen36
+    # container with joint_head_config.json and joint_head.safetensors). The
+    # engine then answers POST /v1/systemone natively AND chats; the family, its
+    # planner and its limits stay the backbone's. "" for every other checkpoint.
+    decision_head: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class DecisionHead:
+    """A decision head a text engine loads beside its backbone (docs/clef.md)."""
+    id: str
+    family: str                  # the engine that runs the backbone and the head
+    files: tuple                 # all of them next to the shards
+    display_name: str
+    model_id: str
+    # (geometry, display_scale): the backbone sizes the head ships on
+    scales: tuple = ()
+    # The context a checkpoint with this head gets when nothing asks for another:
+    # the head's own input budget (Clef's encode_record max_length). 0 = the family's.
+    default_context: int = 0
+    # COLI_DENSE_BITS the gateway sets when the planner's RAM budget holds the
+    # trunk at that width (docs/clef.md: int8 moves Clef's probabilities by up to
+    # 0.22, f16 by 0.012). 0 = the engine's own default.
+    precise_dense_bits: int = 0
+
+
+DECISION_HEADS = (
+    DecisionHead("clef", "qwen36", ("joint_head_config.json", "joint_head.safetensors"),
+                 "Clef", "clef",
+                 scales=(((("num_hidden_layers", 64), ("hidden_size", 5120),
+                           ("intermediate_size", 17408)), "27B"),),
+                 default_context=16384, precise_dense_bits=16),
+)
+
+
+def decision_head_of(resolved):
+    """The DecisionHead a resolved checkpoint carries, or None."""
+    for head in DECISION_HEADS:
+        if head.id == resolved.decision_head:
+            return head
+    return None
+
+
+def default_context(resolved):
+    """The context a resolved checkpoint runs at when none is asked for: its
+    decision head's own budget (Clef: 16384), else the family's default."""
+    head = decision_head_of(resolved)
+    if head and head.default_context:
+        return head.default_context
+    return resolved.descriptor.limits.default_context
+
+
+def checkpoint_decides(resolved):
+    """True when the checkpoint answers POST /v1/systemone natively: a decision
+    family (Laya), or a text family with a decision head (Clef)."""
+    return resolved.descriptor.modality == "decision" or bool(resolved.decision_head)
 
 
 def _required_int(config, key, family, minimum=1):
@@ -1630,6 +1696,98 @@ FAMILIES = (
         modality="image",
         tokenizer_file="processor/tokenizer.json",
     ),
+    FamilyDescriptor(
+        id="laya",
+        # A Laya checkpoint has no config.json at its root: resolve_model reads
+        # rl_agent_config.json and the encoder's own config.json, and names it
+        # laya_<encoder model_type>. The English and typed-decisions checkpoints
+        # are ModernBERT-large; laya-multilingual is mmBERT-base, also model_type
+        # modernbert, and is told apart by its geometry.
+        model_types=("laya_modernbert",),
+        display_name="Laya",
+        display_scale="421M",
+        display_variants=(
+            DisplayVariant((("hidden_size", 1024), ("num_hidden_layers", 28)), "Laya", "421M"),
+            DisplayVariant((("hidden_size", 768), ("num_hidden_layers", 22)),
+                           "Laya multilingual", "322M", model_id="laya-multilingual"),
+        ),
+        engine_artifact="laya",
+        engine_aliases=(),
+        engine_group="laya",
+        internal_arch="laya",
+        build_target="laya",
+        process_names=("laya",),
+        default_model_id="laya",
+        cli_adapter="laya",
+        gateway_adapter="laya",
+        planner_id="laya",
+        planner_geometry=None,
+        planner_unsupported_reason=(
+            "a decision model has no KV cache and no experts: it keeps its weights "
+            "resident (about 1.7 GB in f32 for the 421M checkpoint) and reads at "
+            "most max_len tokens per question"),
+        expert_inventory=lambda _name, _size, _config, _dtype=None: (),
+        config_section="root",
+        # max_len 512 (the English checkpoint) by default; the multilingual
+        # encoder reads up to 8192. No generation, so the output budgets are the
+        # placeholders every descriptor carries, and no context variable: the
+        # engine's own COLI_LAYA_MAX_LEN overrides the checkpoint's max_len.
+        limits=FamilyLimits(512, 8192, 1, 1, 1, 0, ""),
+        capabilities=FamilyCapabilities(False, False, False, False, decision=True),
+        has_gateway_adapter=True,
+        # one-shot `coli run` has nothing to run: a decision needs questions,
+        # which come over POST /v1/systemone from `coli serve` / `coli web`
+        has_cli_adapter=False,
+        supports_accelerator=False,
+        modality="decision",
+        tokenizer_file="tokenizer/tokenizer.json",
+        checkpoint_files=("tokenizer/tokenizer_config.json", "encoder/config.json"),
+    ),
+    FamilyDescriptor(
+        id="gliner_decide",
+        # A GLiNER2 checkpoint's config.json says model_type "extractor" for
+        # every architecture and encoder: resolve_model reads its architecture
+        # and the encoder's own config (encoder_config/config.json) and names it
+        # gliner2_<architecture>_<encoder model_type>. The engine runs the
+        # classification head of the span architecture on a DeBERTa-v2/v3
+        # encoder; GLiNER2.5-Decide is DeBERTa-v3-large (24 layers x 1024).
+        model_types=("gliner2_span_deberta-v2",),
+        display_name="GLiNER2.5-Decide",
+        display_scale="340M",
+        display_variants=(
+            DisplayVariant((("hidden_size", 1024), ("num_hidden_layers", 24)),
+                           "GLiNER2.5-Decide", "340M"),
+        ),
+        engine_artifact="gliner_decide",
+        engine_aliases=(),
+        engine_group="gliner_decide",
+        internal_arch="gliner_decide",
+        build_target="gliner_decide",
+        process_names=("gliner_decide",),
+        default_model_id="gliner2.5-decide",
+        cli_adapter="gliner_decide",
+        gateway_adapter="gliner_decide",
+        planner_id="gliner_decide",
+        planner_geometry=None,
+        planner_unsupported_reason=(
+            "a decision model has no KV cache and no experts: it keeps its encoder and "
+            "classification head resident in f32 and reads every question of a request and "
+            "the state in one sequence of at most COLI_GLINER_MAX_LEN tokens"),
+        expert_inventory=lambda _name, _size, _config, _dtype=None: (),
+        config_section="root",
+        # One sequence per request, cut at 4096 tokens by default
+        # (COLI_GLINER_MAX_LEN); the encoder's relative positions set no
+        # ceiling of their own. No generation, so the output budgets are the
+        # placeholders every descriptor carries, and no context variable.
+        limits=FamilyLimits(4096, 4096, 1, 1, 1, 0, ""),
+        capabilities=FamilyCapabilities(False, False, False, False, decision=True),
+        has_gateway_adapter=True,
+        has_cli_adapter=False,
+        supports_accelerator=False,
+        modality="decision",
+        tokenizer_file="tokenizer.json",
+        checkpoint_files=("config.json", "encoder_config/config.json"),
+    ),
 )
 
 
@@ -1653,8 +1811,11 @@ def _build_registry(families):
                 not isinstance(family.has_cli_adapter, bool) or
                 not isinstance(family.tune_prompt_template, str) or
                 "{prompt}" not in family.tune_prompt_template or
-                family.modality not in ("text", "image") or
-                not isinstance(family.tokenizer_file, str) or not family.tokenizer_file):
+                family.modality not in ("text", "image", "decision") or
+                family.capabilities.decision != (family.modality == "decision") or
+                not isinstance(family.tokenizer_file, str) or not family.tokenizer_file or
+                not isinstance(family.checkpoint_files, tuple) or
+                any(not isinstance(name, str) or not name for name in family.checkpoint_files)):
             raise RegistryError(f"incomplete family descriptor: {family.id}")
         try:
             family.tune_prompt_template.format(prompt="test", prompt_len=4)
@@ -1752,11 +1913,78 @@ def tuning_replay_prompt(family, prompt):
 
 
 MODEL_INDEX = "model_index.json"
+# A Laya checkpoint (and anything trained with its code) carries this instead of
+# a root config.json; its encoder's config.json sits in encoder/.
+DECISION_CONFIG = "rl_agent_config.json"
+
+
+def _resolve_decision_checkpoint(model):
+    """A Laya-style decision checkpoint: rl_agent_config.json at the root, the
+    encoder's config.json under encoder/. The family is keyed on the encoder,
+    laya_<model_type>, and the encoder config is the family config (its geometry
+    names the variant)."""
+    def load(path, what):
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except OSError as error:
+            raise FamilyConfigError(f"cannot read {what}: {model}") from error
+        except json.JSONDecodeError as error:
+            raise FamilyConfigError(f"invalid {what}: {error}") from error
+        if not isinstance(value, dict):
+            raise FamilyConfigError(f"{what} is not a JSON object")
+        return value
+    config = load(model / DECISION_CONFIG, DECISION_CONFIG)
+    encoder = load(model / "encoder" / "config.json", "encoder/config.json")
+    model_type = "laya_" + _normalize_model_type(encoder.get("model_type"))
+    try:
+        family = _BY_TYPE[model_type]
+    except KeyError as error:
+        raise UnknownFamilyError(f"unsupported decision checkpoint: an "
+                                 f"{encoder.get('model_type')} encoder") from error
+    if family.modality != "decision":
+        raise UnknownFamilyError(f"unsupported decision checkpoint: {model_type}")
+    return ResolvedFamily(family, model_type, config, encoder, str(model))
+
+
+# GLiNER2's config.json says model_type "extractor" whatever the architecture
+# and the encoder; the encoder's own config sits in encoder_config/.
+GLINER2_MODEL_TYPE = "extractor"
+GLINER2_ENCODER_CONFIG = "encoder_config/config.json"
+
+
+def _resolve_gliner2_checkpoint(model, config):
+    """A GLiNER2 checkpoint (gliner2's ExtractorConfig): the family is keyed on
+    the architecture and the encoder, gliner2_<architecture>_<encoder
+    model_type>, and the encoder config is the family config (its geometry
+    names the variant). A checkpoint without an architecture is "span", as
+    gliner2's AutoExtractor reads it."""
+    path = model / GLINER2_ENCODER_CONFIG
+    try:
+        encoder = json.loads(path.read_text(encoding="utf-8"))
+    except OSError as error:
+        raise FamilyConfigError(f"cannot read {GLINER2_ENCODER_CONFIG}: {model}") from error
+    except json.JSONDecodeError as error:
+        raise FamilyConfigError(f"invalid {GLINER2_ENCODER_CONFIG}: {error}") from error
+    if not isinstance(encoder, dict):
+        raise FamilyConfigError(f"{GLINER2_ENCODER_CONFIG} is not a JSON object")
+    architecture = config.get("architecture") or "span"
+    if not isinstance(architecture, str):
+        raise FamilyConfigError("config.json: architecture is not a string")
+    model_type = (f"gliner2_{_normalize_model_type(architecture)}_"
+                  f"{_normalize_model_type(encoder.get('model_type'))}")
+    try:
+        family = _BY_TYPE[model_type]
+    except KeyError as error:
+        raise UnknownFamilyError(f"unsupported GLiNER2 checkpoint: the {architecture} architecture "
+                                 f"on an {encoder.get('model_type')} encoder") from error
+    return ResolvedFamily(family, model_type, config, encoder, str(model))
 
 
 def resolve_model(model_dir):
     model = Path(model_dir).expanduser().resolve()
     path = model / "config.json"
+    if not path.is_file() and (model / DECISION_CONFIG).is_file():
+        return _resolve_decision_checkpoint(model)
     if not path.is_file() and (model / MODEL_INDEX).is_file():
         # A diffusers pipeline (Qwen-Image): the root carries model_index.json
         # and each component keeps its own config.json in its own directory.
@@ -1782,14 +2010,26 @@ def resolve_model(model_dir):
             "  carries model_index.json instead.") from error
     except json.JSONDecodeError as error:
         raise FamilyConfigError(f"invalid config.json: {error}") from error
+    if isinstance(config, dict) and config.get("model_type") == GLINER2_MODEL_TYPE:
+        return _resolve_gliner2_checkpoint(model, config)
     family = family_for_config(config)
     family_config = config
     if family.config_section == "text_config":
         family_config = config.get("text_config", config)
         if not isinstance(family_config, dict):
             raise FamilyConfigError(f"{family.id}: text_config is not an object")
+    head = ""
+    for candidate in DECISION_HEADS:
+        present = [name for name in candidate.files if (model / name).is_file()]
+        if candidate.family == family.id and present:
+            if len(present) != len(candidate.files):
+                raise FamilyConfigError(f"{model}: {present[0]} without "
+                                        f"{', '.join(n for n in candidate.files if n not in present)}: "
+                                        f"a {candidate.display_name} decision head needs all of "
+                                        f"{', '.join(candidate.files)}")
+            head = candidate.id
     return ResolvedFamily(family, _normalize_model_type(config.get("model_type")),
-                          config, family_config, str(model))
+                          config, family_config, str(model), head)
 
 
 def default_model_id(resolved):
@@ -1797,6 +2037,9 @@ def default_model_id(resolved):
     one of its own, else the family's."""
     family = resolved.descriptor
     config = resolved.family_config
+    head = decision_head_of(resolved)
+    if head:
+        return head.model_id
     for variant in family.display_variants:
         if variant.model_id and all(config.get(key) == value for key, value in variant.geometry):
             return variant.model_id
@@ -1813,9 +2056,15 @@ def display_for(resolved):
     count.
     """
     family = resolved.descriptor
+    config = resolved.family_config
+    head = decision_head_of(resolved)
+    if head:
+        for geometry, scale in head.scales:
+            if all(config.get(key) == value for key, value in geometry):
+                return head.display_name, scale
+        return head.display_name, ""
     if not family.display_variants:
         return family.display_name, family.display_scale
-    config = resolved.family_config
     for variant in family.display_variants:
         if all(config.get(key) == value for key, value in variant.geometry):
             return variant.display_name, variant.display_scale
@@ -1942,5 +2191,6 @@ def public_metadata(family):
             "audio_payload": family.capabilities.audio_payload,
             "thinking": family.capabilities.thinking,
             "image": family.capabilities.image,
+            "decision": family.capabilities.decision,
         },
     }
